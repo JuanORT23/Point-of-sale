@@ -19,9 +19,10 @@ body {
 
 /* CATÁLOGO */
 .catalogo {
+  margin-top: 20px ;
   width: 70%;
   height: 700px;
-  padding: 10px;
+  padding: 20px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
@@ -29,7 +30,6 @@ body {
 
 /* ESPACIO DONDE SE MUESTRAN LOS PRODUCTOS*/
 .product-grid {
-  margin-top: 20px;
   height: 80%;
   border-radius: 20px;
   border: dotted rgb(204, 204, 204);
