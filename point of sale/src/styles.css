@@ -125,7 +125,7 @@ body {
 
 /* CARRITO */
 .cart{
-  width: 900px; /* MOVI ESTO PERO NO SE COMO VOLVERLO A HACER NORMAL*/
+  width: 30%; /* MOVI ESTO PERO NO SE COMO VOLVERLO A HACER NORMAL*/
   padding: 10px;
   background-color: white;
   border-radius: 10px;
