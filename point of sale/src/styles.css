@@ -28,57 +28,58 @@ body {
 }
 
 /* ESPACIO DONDE SE MUESTRAN LOS PRODUCTOS*/
-.product-grid{
-    margin-top: 20px;
-    height: 80%;
-    border-radius: 20px;
-    border: dotted rgb(204, 204, 204);
-    display:grid;
-    grid-template-columns: repeat(9, 1fr);
-    justify-items: center;
-    overflow: scroll;
+.product-grid {
+  margin-top: 20px;
+  height: 80%;
+  border-radius: 20px;
+  border: dotted rgb(204, 204, 204);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  justify-items: center;
+  overflow: scroll;
 }
 
 /* CAJA DE CADA PRODUCTO*/
-.boxProduct{
-    width: 150px;
-    height: 200px;
-    background-color: #d9dde1;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: space-evenly;
-    align-items: center;
-    padding: 5px;
-    border-radius: 10px;
+.boxProduct {
+  width: 150px;
+  height: 200px;
+  background-color: #d9dde1;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 5px;
+  border-radius: 10px;
 }
 
-.boxProduct::shadow{
+.boxProduct::shadow {
   box-shadow: 2px 2px black;
 }
 
-.textBox{
-    font-size: 15px;
+.textBox {
+  font-size: 15px;
 }
 
 /*CONTENEDOR BOTONES AGREGAR Y QUITAR*/
-.btnesDisposi{
-    height: 30px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+.btnesDisposi {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 /*CONTENEDOR BOTONES PARA MODIFICAR O ELIMINAR PRODUCTO*/
-.btonesMoldearProdcuto{
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    margin-bottom: 5px;
-    margin-top: 5px;
-    gap: 5px;
+.btonesMoldearProdcuto {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  gap: 5px;
 }
 
-.btonRest{
+.btonRest {
   color: white;
   height: 20px;
   width: 20px;
@@ -88,7 +89,7 @@ body {
   border-radius: 5px 0 0 5px;
 }
 
-.btonPlus{
+.btonPlus {
   color: white;
   height: 20px;
   width: 20px;
@@ -97,7 +98,7 @@ body {
   border-radius: 0 5px 5px 0;
 }
 
-.contentPrice{
+.contentPrice {
   color: white;
   height: 20px;
   width: 50px;
@@ -107,7 +108,7 @@ body {
   justify-content: center;
 }
 
-.btonModifPorducto{
+.btonModifPorducto {
   color: white;
   height: 30px;
   border: none;
@@ -115,33 +116,36 @@ body {
   background-color: rgb(42, 195, 203);
 }
 
-.btonDelProducto{
+.btonDelProducto {
   color: white;
   height: 30px;
   border: none;
   border-radius: 10px;
-  background-color: rgb(232, 38, 38);  
+  background-color: rgb(232, 38, 38);
 }
 
 /* CARRITO */
-.cart{
-  width: 30%; /* MOVI ESTO PERO NO SE COMO VOLVERLO A HACER NORMAL*/
+.cart {
+  width: 30%;
+  /* MOVI ESTO PERO NO SE COMO VOLVERLO A HACER NORMAL*/
   padding: 10px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   position: sticky;
   top: 20px;
-  height: 700px; /* ACA SE CAMBIA LO LARGO DE LOS RECUADROS */
+  height: 700px;
+  /* ACA SE CAMBIA LO LARGO DE LOS RECUADROS */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 /* ÁREA VACÍA DEL CARRITO, esto es momentaneo mientras se pone el backend*/
-.cart-empty{  
+.cart-empty {
   flex: 1;
-  border: 2px dashed rgb(204, 204, 204); /* esto es para lineas punteadas*/
+  border: 2px dashed rgb(204, 204, 204);
+  /* esto es para lineas punteadas*/
   border-radius: 10px;
   margin: 10px 0;
 }
@@ -199,86 +203,75 @@ body {
   background: rgb(0, 119, 255);
 }
 
-.btn.orange{
+.btn.orange {
   background-color: orange;
 }
 
 /*FORMULARIOS*/
 
-input{
-    font-family: inherit;
+input {
+  font-family: inherit;
 }
 
-.contenedorForm{
-    margin: 40px auto;
-    padding: 3rem 1.5rem ;
-    background-color: white;
-    width: min(350px, 90%);
-    border-radius: 10px ;
+.contenedorForm {
+  margin: 40px auto;
+  padding: 3rem 1.5rem;
+  background-color: white;
+  width: min(350px, 90%);
+  border-radius: 10px;
 }
 
-.formTittle{
-    font-size: 2rem;
+.formTittle {
+  font-size: 2rem;
 }
 
-.form{
-   margin: 2rem 0 1.5rem ;
-   display: grid;
-   gap: 1.5rem ;
-   color: #6b6b6b;
+.form {
+  margin: 2rem 0 1.5rem;
+  display: grid;
+  gap: 1.5rem;
+  color: #6b6b6b;
 }
 
-.formLabel{
-    width: 100%;
-    display: grid;
-    grid-template-areas: "input";
+.formLabel {
+  width: 100%;
+  display: grid;
+  grid-template-areas: "input";
 }
 
-.formInput{
-    grid-area: input;
-    border-radius: 5px;
-    border: solid 1px #d7d0d0;
-    padding: .7rem 1.5rem ;
-    background-color: #ffffff;
+.formInput {
+  grid-area: input;
+  border-radius: 5px;
+  border: solid 1px #d7d0d0;
+  padding: .7rem 1.5rem;
+  background-color: #ffffff;
 }
 
-.formInput:focus + .formText,  .formInput:not(:placeholder-shown) + .formText{
-     background-color: white; 
-     transform: translateY(-50%) scale(.7);
+.formInput:focus+.formText,
+.formInput:not(:placeholder-shown)+.formText {
+  background-color: white;
+  transform: translateY(-50%) scale(.7);
 }
 
-.formText{
-    grid-area: input;
-    z-index: 10;
-    width: max-content;
-    height: 100%;
-    margin-left: 1rem;
-    padding: 0 .5rem;
-    display: flex;
-    align-items: center;
-    transform-origin: left center;
-    transition: transform .3s;
+.formText {
+  grid-area: input;
+  z-index: 10;
+  width: max-content;
+  height: 100%;
+  margin-left: 1rem;
+  padding: 0 .5rem;
+  display: flex;
+  align-items: center;
+  transform-origin: left center;
+  transition: transform .3s;
 }
 
-.contentBtonForms{
+.contentBtonForms {
   display: flex;
   flex-flow: nowrap row;
   justify-content: space-around;
 }
 
-.btonAdd{
-  height: 40px;
-  width: 100px;
-  background-color:  #3498db;
-  border-radius: 10px;
-  border: none;
-  color: white;
-}
-
-button{
-  cursor: pointer;
-}
-.btonBack{
+.btonAdd {
   height: 40px;
   width: 100px;
   background-color: #3498db;
@@ -286,6 +279,20 @@ button{
   border: none;
   color: white;
 }
+
+button {
+  cursor: pointer;
+}
+
+.btonBack {
+  height: 40px;
+  width: 100px;
+  background-color: #3498db;
+  border-radius: 10px;
+  border: none;
+  color: white;
+}
+
 /* RESPONSIVE */
 @media (max-width: 700px) {
   .main-content {
@@ -297,13 +304,13 @@ button{
     width: 100%;
   }
 
-  .product-grid{
+  .product-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 900px){
-  .product-grid{
+@media (max-width: 900px) {
+  .product-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
