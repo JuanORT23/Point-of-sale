@@ -248,6 +248,8 @@ function FormularioAgregarProducto({ cambiarVista }) {
 
 function FormularioEliminarCategoria({ cambiarVista }) {
 
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("")
+
   function eliminarCategoria(idCode) {
     fetch(`https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=categorias&idCode=${idCode}`, {
       method: "POST",
@@ -269,8 +271,6 @@ function FormularioEliminarCategoria({ cambiarVista }) {
     }
     getData()
   }, [])
-
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("")
 
   return (
     <div className='contenedorForm'>
