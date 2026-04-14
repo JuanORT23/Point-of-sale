@@ -47,7 +47,7 @@ function ActionsBar({ cambiarVista }) {
   );
 }
 
-function ProductGrid({ eliminarProducto }) {
+function ProductGrid({ eliminarProducto, agregarAlCarrito }) {
   const [productos, setProductos] = useState([])
 
   useEffect(() => {
@@ -71,9 +71,8 @@ function ProductGrid({ eliminarProducto }) {
             <p className='textBox'>{producto.category}</p>
             <p className='textBox'>{producto.stock}</p>
             <div className='btnesDisposi'>
-              <button className='btonRest'> - </button>
               <span className='contentPrice'>{producto.price}</span>
-              <button className='btonPlus'> + </button>
+              <button className='btonPlus' onClick={() => agregarAlCarrito(producto)}> + </button>
             </div>
             <div className='btonesMoldearProdcuto'>
               <button className='btonModifPorducto'> Modificar </button>
@@ -86,19 +85,48 @@ function ProductGrid({ eliminarProducto }) {
   );
 }
 
-function Cart() {
+function Cart({ carrito, sumarAlCarrito, restarDelCarrito, eliminarDelCarrito }) {
+  // Calculamos el total
+  const total = carrito.reduce((acumulador, item) => acumulador + (item.price * item.cantidad), 0);
+
   return (
     <div className="cart">
-
-
       <h2>Carro de compras</h2>
 
-      {/* Área donde va la info del pedido, pero eso se hace con backend */}
-      <div className="cart-empty">
-        {/* Aquí luego aparecerán los productos */}
+      <div className="cart-empty" style={{ padding: '10px', overflowY: 'auto' }}>
+        {carrito.length === 0 ? (
+          <p style={{ textAlign: 'center', color: 'gray' }}>El carrito está vacío</p>
+        ) : (
+          carrito.map((item, index) => (
+            <div key={index} style={{ display: 'flex', flexDirection: 'column', borderBottom: '1px solid #ccc', padding: '10px 0', gap: '5px' }}>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                <span>{item.name}</span>
+                <span>${item.price * item.cantidad}</span>
+              </div>
+              
+              {/* Controles de cantidad y eliminar */}
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <button onClick={() => restarDelCarrito(item.id)} className="btonRest">-</button>
+                <span>{item.cantidad}</span>
+                <button onClick={() => sumarAlCarrito(item)} className="btonPlus">+</button>
+                
+                <button 
+                  onClick={() => eliminarDelCarrito(item.id)} 
+                  style={{ marginLeft: 'auto', backgroundColor: '#e82626', color: 'white', border: 'none', borderRadius: '5px', padding: '2px 8px', cursor: 'pointer' }}
+                >
+                  Quitar
+                </button>
+              </div>
+
+            </div>
+          ))
+        )}
       </div>
 
-      {/* Botón de pago */}
+      <div style={{ padding: '10px', textAlign: 'right' }}>
+        <h3>Total: ${total}</h3>
+      </div>
       <button className="pay-btn">
         REALIZAR PAGO
       </button>
@@ -295,6 +323,7 @@ function FormularioEliminarCategoria({ cambiarVista }) {
 
 function App() {
   const [vista, setVista] = useState("appPrincipal")
+  const[carrito, setCarrito] = useState([])
 
   function cambiarVista(vista) {
     setVista(vista)
@@ -308,6 +337,41 @@ function App() {
     })
     console.log(deleteData)
   }
+
+  const agregarAlCarrito = (productoAAgregar) => {
+    setCarrito((carritoActual) => {
+      const existe = carritoActual.find((item) => item.id === productoAAgregar.id);
+      if(existe){
+        return carritoActual.map((item)=>
+        item.id === productoAAgregar.id
+        ? {...item, cantidad: item.cantidad + 1}
+        : item
+      );
+      } else {
+        return[...carritoActual,  {...productoAAgregar, cantidad: 1}];
+      }
+    });
+  }
+  
+  const restarDelCarrito = (idProducto) => {
+    setCarrito((carritoActual) => {
+      return carritoActual.map((item) => {
+        // Si es el producto que queremos restar y su cantidad es mayor a 1
+        if (item.id === idProducto && item.cantidad > 1) {
+          return { ...item, cantidad: item.cantidad - 1 };
+        }
+        return item; // Si es 1, lo dejamos igual (para eso usarán el botón eliminar)
+      });
+    });
+  }
+
+  const eliminarDelCarrito = (idProducto) => {
+    setCarrito((carritoActual) => 
+      // filter crea un nuevo arreglo SOLO con los productos que NO coincidan con el id
+      carritoActual.filter((item) => item.id !== idProducto)
+    );
+  }
+
   return (
     <div className="app-container">
       {vista === "agregarProducto" &&
@@ -325,10 +389,14 @@ function App() {
           <div className="main-content">
             <div className="catalogo">
               <ActionsBar cambiarVista={cambiarVista} />
-              <ProductGrid eliminarProducto={eliminarProducto} />
+              <ProductGrid eliminarProducto={eliminarProducto} agregarAlCarrito={agregarAlCarrito} />
             </div>
             <div>
-              <Cart />
+              <Cart carrito={carrito}
+              sumarAlCarrito={agregarAlCarrito}
+              restarDelCarrito={restarDelCarrito}
+              eliminarDelCarrito={eliminarDelCarrito}
+              />
             </div>
           </div>
         </div>
