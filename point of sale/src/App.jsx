@@ -26,9 +26,7 @@ function Header({ cambiarVista, valorVista }) {
             // Si el tab está activo, aplica la clase "tab-activo" que lo pone blanco con letra negra
             className={`header-tab ${tabActivo === tab ? "tab-activo" : ""}`}
             onClick={() => {
-              const resultado = setTabActivo
-              console.log(`Que retorna set activo ${resultado}`);
-              console.log("Es verdadero", Boolean(resultado));
+              setTabActivo(tab)
               cambiarVista(tab)
 
 
