@@ -28,8 +28,6 @@ function Header({ cambiarVista, valorVista }) {
             onClick={() => {
               setTabActivo(tab)
               cambiarVista(tab)
-
-
             }
             }
           >
