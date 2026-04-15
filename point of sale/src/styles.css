@@ -7,10 +7,43 @@ body {
 .header {
   background: #1e3a5f;
   color: white;
-  padding: 15px;
+  padding: 15px 15px 0 15px;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* CONTENEDOR PRINCIPAL, aca van ambos recuadros */
+.header-tabs {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  align-self: flex-end;
+}
+
+.header-tab {
+  background-color: #2a6496;
+  color: white;
+  border: none;
+
+  border-radius: 6px 6px 0 0;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.header-tab:hover {
+  background-color: rgb(58, 133, 200);
+}
+.tab-activo {
+  background-color: white !important;
+  color: black !important;
+}
+
 .main-content {
   display: flex;
   gap: 10px;
@@ -40,37 +73,45 @@ body {
   overflow: scroll;
 }
 
-/* CAJA DE CADA PRODUCTO*/
 .boxProduct {
-  width: 150px;
-  height: 200px;
-  background-color: grey;
-  display: flex;
+  width: 100%;
+  background-color: white;
+  display: inline-flex;
   flex-flow: column nowrap;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
-  padding: 5px;
-  border-radius: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgb(224, 224, 224);
+  gap: 4px;
+  box-sizing: border-box;
   
 }
 
-.boxProduct::shadow {
-  box-shadow: 2px 2px black;
-}
-
 .textBox {
-  font-size: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  color:black;
+  line-height: 1;
+  text-align: center;
 }
 
-/*CONTENEDOR BOTONES AGREGAR Y QUITAR*/
+/*conteneder de los boton para agregar*/
 .btnesDisposi {
-  height: 30px;
+  width: 30%;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 0;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  
+
 }
 
-/*CONTENEDOR BOTONES PARA MODIFICAR O ELIMINAR PRODUCTO*/
+/*CONTENEDOR botones de modificar y agregar*/
 .btonesMoldearProdcuto {
   display: flex;
   flex-flow: row nowrap;
@@ -80,33 +121,26 @@ body {
   gap: 5px;
 }
 
-.btonRest {
-  color: white;
-  height: 20px;
-  width: 20px;
-  border-radius: 10px 0px 10px 0xp;
-  border: none;
-  background-color: #3498db;
-  border-radius: 5px 0 0 5px;
-}
-
+/*ACA estan el boton de agregar mas en los productos (los siguientes dos)*/
 .btonPlus {
   color: white;
-  height: 20px;
+  height: 30px;
   width: 20px;
   border: none;
   background-color: #3498db;
   border-radius: 0 5px 5px 0;
+  
 }
 
 .contentPrice {
   color: white;
-  height: 20px;
+  height: 30px;
   width: 50px;
-  background-color: #3498db;
+  background-color: rgb(52, 152, 219);
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 5px 0px 0px 5px;
 }
 
 .btonModifPorducto {
@@ -125,10 +159,8 @@ body {
   background-color: rgb(232, 38, 38);
 }
 
-/* CARRITO */
 .cart {
   width: 170%;
-  /* MOVI ESTO PERO NO SE COMO VOLVERLO A HACER NORMAL*/
   padding: 10px;
   background-color: white;
   border-radius: 10px;
@@ -136,17 +168,14 @@ body {
   position: sticky;
   top: 20px;
   height: 700px;
-  /* ACA SE CAMBIA LO LARGO DE LOS RECUADROS */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* ÁREA VACÍA DEL CARRITO, esto es momentaneo mientras se pone el backend*/
 .cart-empty {
   flex: 1;
   border: 2px dashed rgb(204, 204, 204);
-  /* esto es para lineas punteadas*/
   border-radius: 10px;
   margin: 10px 0;
 }
@@ -239,79 +268,56 @@ input {
   grid-template-areas: "input";
 }
 
-.formInput {
-  grid-area: input;
-  border-radius: 5px;
-  border: solid 1px #d7d0d0;
-  padding: .7rem 1.5rem;
-  background-color: #ffffff;
-}
 
-.formInput:focus+.formText,
-.formInput:not(:placeholder-shown)+.formText {
-  background-color: white;
-  transform: translateY(-50%) scale(.7);
-}
 
-.formText {
-  grid-area: input;
-  z-index: 10;
-  width: max-content;
-  height: 100%;
-  margin-left: 1rem;
-  padding: 0 .5rem;
-  display: flex;
-  align-items: center;
-  transform-origin: left center;
-  transition: transform .3s;
-}
 
 .contentBtonForms {
   display: flex;
   flex-flow: nowrap row;
   justify-content: space-around;
 }
-
-.btonAdd {
-  height: 40px;
-  width: 100px;
-  background-color: #3498db;
-  border-radius: 10px;
-  border: none;
-  color: white;
-}
-
 button {
   cursor: pointer;
 }
 
-.btonBack {
-  height: 40px;
-  width: 100px;
-  background-color: #3498db;
-  border-radius: 10px;
-  border: none;
-  color: white;
+@media (max-width: 1200px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
-
-/* RESPONSIVE */
-@media (max-width: 700px) {
+@media (max-width: 1024px) {
   .main-content {
     flex-direction: column;
   }
 
-  .catalogo,
-  .cart {
+  .catalogo {
     width: 100%;
+    height: auto;
   }
 
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .cart {
+    width: 100%;
+    position: static;
+    height: auto;
+  }
+
+  .actions-container {
+    flex-wrap: wrap;
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 600px) {
   .product-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 0;
+  }
+
+  .header-tabs {
+    width: 100%;
+    overflow-x: auto;
   }
 }

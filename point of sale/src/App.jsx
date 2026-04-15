@@ -8,12 +8,31 @@ function Boton({ value }) {
   )
 }
 function Header() {
+  // Estado para saber cuál tab está activo. por defecto se pone en venta q es la pantalla principal 
+  const [tabActivo, setTabActivo] = useState("VENTA")
+
+  
+  const tabs = ["VENTA", "CLIENTES", "PROVEEDORES", "COMPRAS", "HISTORIAL DE VENTAS"]
+
   return (
     <div className="header">
-
       <h1>Papelería Papel y Luna</h1>
+
+      {/* Contenedor de los tabs de navegación */}
+      <div className="header-tabs">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            // Si el tab está activo, aplica la clase "tab-activo" que lo pone blanco con letra negra
+            className={`header-tab ${tabActivo === tab ? "tab-activo" : ""}`}
+            onClick={() => setTabActivo(tab)}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
     </div>
-  );
+  )
 }
 
 function ActionsBar({ cambiarVista }) {
@@ -71,7 +90,6 @@ function ProductGrid({ eliminarProducto }) {
             <p className='textBox'>{producto.category}</p>
             <p className='textBox'>{producto.stock}</p>
             <div className='btnesDisposi'>
-              <button className='btonRest'> - </button>
               <span className='contentPrice'>{producto.price}</span>
               <button className='btonPlus'> + </button>
             </div>
