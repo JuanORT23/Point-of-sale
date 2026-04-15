@@ -104,7 +104,7 @@ body {
   width: 30%;
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 5px ;
   margin-top: 4px;
   margin-bottom: 2px;
   
@@ -135,7 +135,7 @@ body {
 .contentPrice {
   color: white;
   height: 30px;
-  width: 50px;
+  width: 100px;
   background-color: rgb(52, 152, 219);
   display: flex;
   align-items: center;
@@ -239,45 +239,86 @@ body {
 
 /*FORMULARIOS*/
 
-input {
-  font-family: inherit;
+input{
+    font-family: inherit;
 }
 
-.contenedorForm {
-  margin: 40px auto;
-  padding: 3rem 1.5rem;
-  background-color: white;
-  width: min(350px, 90%);
-  border-radius: 10px;
+.contenedorForm{
+    margin: 40px auto;
+    padding: 3rem 1.5rem ;
+    background-color: white;
+    width: min(350px, 90%);
+    border-radius: 10px ;
 }
 
-.formTittle {
-  font-size: 2rem;
+.formTittle{
+    font-size: 2rem;
 }
 
-.form {
-  margin: 2rem 0 1.5rem;
-  display: grid;
-  gap: 1.5rem;
-  color: #6b6b6b;
+.form{
+   margin: 2rem 0 1.5rem ;
+   display: grid;
+   gap: 1.5rem ;
+   color: #6b6b6b;
 }
 
-.formLabel {
-  width: 100%;
-  display: grid;
-  grid-template-areas: "input";
+.formLabel{
+    width: 100%;
+    display: grid;
+    grid-template-areas: "input";
 }
 
+.formInput{
+    grid-area: input;
+    border-radius: 5px;
+    border: solid 1px #d7d0d0;
+    padding: .7rem 1.5rem ;
+    background-color: #ffffff;
+}
 
+.formInput:focus + .formText,  .formInput:not(:placeholder-shown) + .formText{
+     background-color: white; 
+     transform: translateY(-50%) scale(.7);
+}
 
+.formText{
+    grid-area: input;
+    z-index: 10;
+    width: max-content;
+    height: 100%;
+    margin-left: 1rem;
+    padding: 0 .5rem;
+    display: flex;
+    align-items: center;
+    transform-origin: left center;
+    transition: transform .3s;
+}
 
-.contentBtonForms {
+.contentBtonForms{
   display: flex;
   flex-flow: nowrap row;
   justify-content: space-around;
 }
-button {
+
+.btonAdd{
+  height: 40px;
+  width: 100px;
+  background-color:  #3498db;
+  border-radius: 10px;
+  border: none;
+  color: white;
+}
+
+button{
   cursor: pointer;
+}
+.btonBack{
+  height: 40px;
+  width: 100px;
+  background-color: #3498db;
+  border-radius: 10px;
+  border: none;
+  color: white;
 }
 
 @media (max-width: 1200px) {

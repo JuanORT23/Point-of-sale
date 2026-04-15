@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import './styles.css'
 
@@ -7,12 +7,12 @@ function Boton({ value }) {
     <button>{value}</button>
   )
 }
-function Header() {
-  // Estado para saber cuál tab está activo. por defecto se pone en venta q es la pantalla principal 
-  const [tabActivo, setTabActivo] = useState("VENTA")
+function Header({ cambiarVista, valorVista }) {
 
-  
-  const tabs = ["VENTA", "CLIENTES", "PROVEEDORES", "COMPRAS", "HISTORIAL DE VENTAS"]
+  const [tabActivo, setTabActivo] = useState({ valorVista })
+
+
+  const tabs = ["Venta", "Historial de ventas", "Clientes", "Proveedores", "Compras"]
 
   return (
     <div className="header">
@@ -25,9 +25,17 @@ function Header() {
             key={tab}
             // Si el tab está activo, aplica la clase "tab-activo" que lo pone blanco con letra negra
             className={`header-tab ${tabActivo === tab ? "tab-activo" : ""}`}
-            onClick={() => setTabActivo(tab)}
+            onClick={() => {
+              const resultado = setTabActivo
+              console.log(`Que retorna set activo ${resultado}`);
+              console.log("Es verdadero", Boolean(resultado));
+              cambiarVista(tab)
+
+
+            }
+            }
           >
-            {tab}
+            {tab.toUpperCase()}
           </button>
         ))}
       </div>
@@ -35,7 +43,37 @@ function Header() {
   )
 }
 
-function ActionsBar({ cambiarVista }) {
+function HistorialVentasGrid() {
+  return (
+    <div>
+
+    </div>
+  )
+}
+
+function ClientesGrid() {
+  return (
+    <div>
+
+    </div>
+  )
+}
+
+function ProveedoresGrid() {
+  return (
+    <div>
+
+    </div>
+  )
+}
+
+function ComprasGrid() {
+  <div>
+
+  </div>
+}
+
+function ActionsBarVenta({ cambiarVista }) {
   return (
     <div className="actions-bar">
 
@@ -86,11 +124,11 @@ function ProductGrid({ eliminarProducto }) {
       {productos.map((producto) => {
         return (
           <div className='boxProduct' key={producto.id}>
-            <p className='textBox'>{producto.name}</p>
-            <p className='textBox'>{producto.category}</p>
-            <p className='textBox'>{producto.stock}</p>
+            <p className='textBox'> Producto: {producto.name}</p>
+            <p className='textBox'> Categría: {producto.category}</p>
+            <p className='textBox'> Stock: {producto.stock}</p>
             <div className='btnesDisposi'>
-              <span className='contentPrice'>{producto.price}</span>
+              <span className='contentPrice'> ${producto.price} COP</span>
               <button className='btonPlus'> + </button>
             </div>
             <div className='btonesMoldearProdcuto'>
@@ -163,7 +201,7 @@ function FormularioAgregarCategoria({ cambiarVista }) {
         </label>
         <div className='contentBtonForms'>
           <button className='btonAdd'> Crear </button>
-          <button onClick={() => cambiarVista("appPrincipal")} type='button' className='btonBack'> Volver </button>
+          <button onClick={() => cambiarVista("Venta")} type='button' className='btonBack'> Volver </button>
         </div>
       </form>
     </div>
@@ -221,7 +259,7 @@ function FormularioAgregarProducto({ cambiarVista }) {
       body: JSON.stringify(product)
     })
 
-    setProduct({ ...product, id: "", name: "", category: "", price: "", stock: "" })
+    setProduct({ ...product, id: "", name: "", category: "", price: 0, stock: 0 })
   }
 
   return (
@@ -257,7 +295,7 @@ function FormularioAgregarProducto({ cambiarVista }) {
         </label>
         <div className='contentBtonForms'>
           <button className='btonAdd'> Crear </button>
-          <button onClick={() => cambiarVista("appPrincipal")} type='button' className='btonBack'> Volver </button>
+          <button onClick={() => cambiarVista("Venta")} type='button' className='btonBack'> Volver </button>
         </div>
       </form>
     </div>
@@ -266,7 +304,7 @@ function FormularioAgregarProducto({ cambiarVista }) {
 
 function FormularioEliminarCategoria({ cambiarVista }) {
 
-    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("")
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("")
 
   function eliminarCategoria(idCode) {
     fetch(`https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=categorias&idCode=${idCode}`, {
@@ -297,14 +335,14 @@ function FormularioEliminarCategoria({ cambiarVista }) {
         {categorias.map((categoria) => {
           return (
             <label key={categoria.id}>
-              <input type="radio" name="categorias" value={categoria.id} onChange={(event) => setCategoriaSeleccionada(event.target.value)} checked={ categoriaSeleccionada == String(categoria.id)}/>
+              <input type="radio" name="categorias" value={categoria.id} onChange={(event) => setCategoriaSeleccionada(event.target.value)} checked={categoriaSeleccionada == String(categoria.id)} />
               {categoria.name}
             </label>
           )
         })}
         <div className='contentBtonForms'>
           <button className='btonAdd '> Eliminar </button>
-          <button className='btonBack' type='button' onClick={() => cambiarVista("appPrincipal")}> Volver </button>
+          <button className='btonBack' type='button' onClick={() => cambiarVista("Venta")}> Volver </button>
         </div>
       </form>
     </div>
@@ -312,10 +350,11 @@ function FormularioEliminarCategoria({ cambiarVista }) {
 }
 
 function App() {
-  const [vista, setVista] = useState("appPrincipal")
+  const [vista, setVista] = useState("Venta")
 
-  function cambiarVista(vista) {
-    setVista(vista)
+  function cambiarVista(nuevaVista) {
+    setVista(nuevaVista)
+    console.log(`Venimos de: ${vista} y pasamos a ${nuevaVista}`)
   }
 
   async function eliminarProducto(idProducto) {
@@ -337,21 +376,65 @@ function App() {
       {vista === "eliminarCategoria" &&
         <FormularioEliminarCategoria cambiarVista={cambiarVista} />
       }
-      {vista === "appPrincipal" &&
-        <div>
-          <Header />
+      {vista === "Clientes" &&
+        < div >
+          <Header cambiarVista={cambiarVista} valorVista={vista}/>
           <div className="main-content">
-            <div className="catalogo">
-              <ActionsBar cambiarVista={cambiarVista} />
-              <ProductGrid eliminarProducto={eliminarProducto} />
-            </div>
-            <div>
-              <Cart />
+            <div className="Historial de ventas">
+              <ClientesGrid />
             </div>
           </div>
         </div>
       }
+      {
+        vista === "Historial de ventas" &&
+        <div>
+          <Header cambiarVista={cambiarVista} valorVista={vista} />
+          <div className="main-content">
+            <div className="Historial de ventas">
+              <HistorialVentasGrid />
+            </div>
+          </div>
+        </div>
+      }
+      {
+        vista === "Proveedores" &&
+        < div >
+                <Header cambiarVista={cambiarVista} valorVista={vista}/>
+                <div className="main-content">
+                  <div className="Historial de ventas">
+                    <ProveedoresGrid />
+                  </div>
+                </div>
+              </div >
+            }
+      {
+        vista === "Compras" &&
+        < div >
+                <Header cambiarVista={cambiarVista} valorVista={vista}/>
+                <div className="main-content">
+                  <div className="Historial de ventas">
+                    <ComprasGrid />
+                  </div>
+                </div>
+              </div >
+            }
+{
+  vista === "Venta" &&
+  <div>
+    <Header cambiarVista={cambiarVista} valorVista={vista} />
+    <div className="main-content">
+      <div className="catalogo">
+        <ActionsBarVenta cambiarVista={cambiarVista} />
+        <ProductGrid eliminarProducto={eliminarProducto} />
+      </div>
+      <div>
+        <Cart />
+      </div>
     </div>
+  </div>
+}
+    </div >
   );
 }
 
