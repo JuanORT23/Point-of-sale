@@ -532,7 +532,7 @@ function FormularioEliminarCategoria({ cambiarVista }) {
         </form>
       }
       <div className='contentBtonForms'>
-        <button className='btonAdd ' onClick={() => eliminarCategoria(categoriaSeleccionada)}> Eliminar </button>
+        <button className='btonDelete' onClick={() => eliminarCategoria(categoriaSeleccionada)}> Eliminar </button>
         <button className='btonBack' type='button' onClick={() => cambiarVista("Venta")}> Volver </button>
       </div>
     </div>
