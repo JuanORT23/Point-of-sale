@@ -104,11 +104,9 @@ body {
   width: 30%;
   display: flex;
   align-items: center;
-  gap: 5px ;
+  gap: 0px ;
   margin-top: 4px;
   margin-bottom: 2px;
-  
-
 }
 
 /*CONTENEDOR botones de modificar y agregar*/
@@ -124,23 +122,25 @@ body {
 /*ACA estan el boton de agregar mas en los productos (los siguientes dos)*/
 .btonPlus {
   color: white;
-  height: 30px;
+  height: 50px;
   width: 20px;
   border: none;
   background-color: #3498db;
   border-radius: 0 5px 5px 0;
   
+  
 }
 
 .contentPrice {
   color: white;
-  height: 30px;
-  width: 100px;
+  height: 50px;
+  width: 110px;
   background-color: rgb(52, 152, 219);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 5px 0px 0px 5px;
+  padding-left: 10px;
 }
 
 .btonModifPorducto {
