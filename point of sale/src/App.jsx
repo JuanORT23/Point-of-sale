@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import './App.css'
 import './styles.css'
+import logo from "./assets/LogoPapeleria.png";
 
 function Boton({ value }) {
   return (
@@ -17,33 +18,33 @@ function Header({ cambiarVista, valorVista }) {
 
   return (
     <div className="header">
-      <h1>Papelería Papel y Luna</h1>
+  <div className="header-logo">
+    <img src={logo} alt="Logo Papelería Papel y Luna" />
+    <h1>Papelería Papel y Luna</h1>
+  </div>
 
-      {/* Contenedor de los tabs de navegación */}
-      <div className="header-tabs">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            // Si el tab está activo, aplica la clase "tab-activo" que lo pone blanco con letra negra
-            className={`header-tab ${tabActivo === tab ? "tab-activo" : ""}`}
-            onClick={() => {
-              setTabActivo(tab)
-              cambiarVista(tab)
-            }
-            }
-          >
-            {tab.toUpperCase()}
-          </button>
-        ))}
-      </div>
-    </div>
+  <div className="header-tabs">
+    {tabs.map((tab) => (
+      <button
+        key={tab}
+        className={`header-tab ${tabActivo === tab ? "tab-activo" : ""}`}
+        onClick={() => {
+          setTabActivo(tab)
+          cambiarVista(tab)
+        }}
+      >
+        {tab.toUpperCase()}
+      </button>
+    ))}
+  </div>
+</div>
   )
 }
 
 function HistorialVentasGrid() {
   return (
 
-    <div className="catalogo">
+    <div className="recuadro">
       {/* Barra superior con título y filtro */}
       <div className="actions-bar">
         <h2>Historial de Ventas</h2>
@@ -53,7 +54,7 @@ function HistorialVentasGrid() {
           </select>
         </div>
       </div>
-      <div className="product-grid">
+      <div className="recuadro-grid">
       </div>
     </div>
   )
@@ -61,7 +62,7 @@ function HistorialVentasGrid() {
 
 function ClientesGrid() {
   return (
-    <div className="catalogo">
+    <div className="recuadro">
 
       <div className="actions-bar">
         <h2>Clientes</h2>
@@ -73,7 +74,7 @@ function ClientesGrid() {
         </div>
       </div>
 
-      <div className="product-grid">
+      <div className="recuadro-grid">
         {/* Aqui toca meter los clientes con backend porfaaaaaaa */}
       </div>
 
@@ -83,7 +84,7 @@ function ClientesGrid() {
 
 function ProveedoresGrid() {
   return (
-    <div className="catalogo">
+    <div className="recuadro">
 
       <div className="actions-bar">
         <h2>Proveedores</h2>
@@ -95,7 +96,7 @@ function ProveedoresGrid() {
         </div>
       </div>
 
-      <div className="product-grid">
+      <div className="recuadro-grid">
         {/* LO MISMOOOOO, llenar los proveedores con backend acaaaa */}
       </div>
 
@@ -105,7 +106,7 @@ function ProveedoresGrid() {
 
 function ComprasGrid() {
   return (
-    <div className="catalogo">
+    <div className="recuadro">
       <div className="actions-bar">
         <h2>Compras</h2>
         <div className="actions-container">
@@ -114,7 +115,7 @@ function ComprasGrid() {
           </select>
         </div>
       </div>
-      <div className="product-grid">
+      <div className="recuadro-grid">
         {/* LAS COmpras la llenas con backeeeend */}
       </div>
 

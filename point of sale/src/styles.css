@@ -15,6 +15,17 @@ body {
   width: 100%;
   box-sizing: border-box;
 }
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+}
+
+.header-logo img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
 
 .header-tabs {
   display: flex;
@@ -61,6 +72,25 @@ body {
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+.recuadro {
+  margin-top: 20px ;
+  width: 500%;
+  height: 700px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+.recuadro-grid {
+  height: 80%;
+  border-radius: 20px;
+  border: dotted rgb(204, 204, 204);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  justify-items: center;
+  overflow: scroll;
+}
 /* ESPACIO DONDE SE MUESTRAN LOS PRODUCTOS*/
 .product-grid {
   height: 80%;
@@ -72,6 +102,7 @@ body {
   justify-items: center;
   overflow: scroll;
 }
+
 
 .boxProduct {
   width: 100%;
