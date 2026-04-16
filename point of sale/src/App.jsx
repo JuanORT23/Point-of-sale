@@ -10,7 +10,7 @@ function Boton({ value }) {
 }
 function Header({ cambiarVista, valorVista }) {
 
-  const [tabActivo, setTabActivo] = useState({ valorVista })
+  const [tabActivo, setTabActivo] = useState(valorVista)
 
 
   const tabs = ["Venta", "Historial de ventas", "Clientes", "Proveedores", "Compras"]
@@ -42,15 +42,40 @@ function Header({ cambiarVista, valorVista }) {
 
 function HistorialVentasGrid() {
   return (
-    <div>
 
+    <div className="catalogo">
+      {/* Barra superior con título y filtro */}
+      <div className="actions-bar">
+        <h2>Historial de Ventas</h2>
+        <div className="actions-container">
+          <select className="category-select">
+            <option>Todos</option>
+          </select>
+        </div>
+      </div>
+      <div className="product-grid">
+      </div>
     </div>
   )
 }
 
 function ClientesGrid() {
   return (
-    <div>
+    <div className="catalogo">
+
+      <div className="actions-bar">
+        <h2>Clientes</h2>
+        <div className="actions-container">
+          <button className="btn green">+ Agregar Cliente</button>
+          <select className="category-select">
+            <option>Todos</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="product-grid">
+        {/* Aqui toca meter los clientes con backend porfaaaaaaa */}
+      </div>
 
     </div>
   )
@@ -58,16 +83,43 @@ function ClientesGrid() {
 
 function ProveedoresGrid() {
   return (
-    <div className='proveedoresGrid'>
-      
+    <div className="catalogo">
+
+      <div className="actions-bar">
+        <h2>Proveedores</h2>
+        <div className="actions-container">
+          <button className="btn green">+ Agregar Proveedor</button>
+          <select className="category-select">
+            <option>Todos</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="product-grid">
+        {/* LO MISMOOOOO, llenar los proveedores con backend acaaaa */}
+      </div>
+
     </div>
   )
 }
 
 function ComprasGrid() {
-  <div>
+  return (
+    <div className="catalogo">
+      <div className="actions-bar">
+        <h2>Compras</h2>
+        <div className="actions-container">
+          <select className="category-select">
+            <option>Todos</option>
+          </select>
+        </div>
+      </div>
+      <div className="product-grid">
+        {/* LAS COmpras la llenas con backeeeend */}
+      </div>
 
-  </div>
+    </div>
+  )
 }
 
 function ActionsBarVenta({ cambiarVista, setCategoriaFiltro, categoriaFiltro, busqueda, setBusqueda }) {
