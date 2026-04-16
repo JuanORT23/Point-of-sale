@@ -5,13 +5,13 @@ body {
 }
 
 .header {
-  background: #1e3a5f;
+  background: rgb(30, 58, 95);
   color: white;
   padding: 15px 15px 0 15px;
   display: flex;
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 100px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -75,7 +75,7 @@ body {
 
 .recuadro {
   margin-top: 20px ;
-  width: 500%;
+  width: 500px;
   height: 700px;
   padding: 20px;
   background-color: white;
