@@ -69,39 +69,130 @@ function ComprasGrid() {
   </div>
 }
 
-function ActionsBarVenta({ cambiarVista }) {
+function ActionsBarVenta({ cambiarVista, setCategoriaFiltro, categoriaFiltro, busqueda, setBusqueda }) {
+  const [categorias, setCategorias] = useState([])
+
+  useEffect(() => {
+    async function getData() {
+      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=categorias", {
+        method: "GET"
+      })
+      const response = await dataBase.json()
+      setCategorias(response.data)
+    }
+    getData()
+  }, [])
+
   return (
     <div className="actions-bar">
-
-      {/* Título */}
       <h2>Catálogo de productos</h2>
-
       <div className="actions-container">
 
-        {/* Barra de búsqueda */}
         <input
           type="text"
           placeholder="Buscar Producto"
           className="search-input"
+          onChange={(e) => setBusqueda(e.target.value)}
         />
 
-        {/* Selector de categorías */}
-        <select className="category-select">
-          <option>Todos</option>
+        <select
+          className="category-select"
+          value={categoriaFiltro}
+          onChange={(e) => setCategoriaFiltro(e.target.value)}
+        >
+          <option value="Todos">Todos</option>
+          {categorias.map((categoria) => (
+            <option key={categoria.id} value={categoria.name}>{categoria.name}</option>
+          ))}
         </select>
 
-        {/* Botones originales */}
         <button className="btn green" onClick={() => cambiarVista("agregarProducto")}>+ Agregar producto</button>
         <button className="btn blue" onClick={() => cambiarVista("agregarCategoria")}>+ Agregar categoría</button>
         <button className='btn orange' onClick={() => cambiarVista("eliminarCategoria")}> - Eliminar categoría </button>
       </div>
-
     </div>
   );
 }
+function FormModificarProducto({ cambiarVista, producto }) {
+  const [product, setProduct] = useState({
+    id: producto.id || "",
+    name: producto.name || "",
+    category: producto.category || "",
+    price: producto.price || 0,
+    stock: producto.stock || 0
+  })
 
-function ProductGrid({ eliminarProducto }) {
+  const [categorias, setCategorias] = useState([])
+
+  useEffect(() => {
+    async function getData() {
+      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias", {
+        method: "GET",
+      })
+      const response = await dataBase.json()
+      setCategorias(response.data)
+    }
+    getData()
+  }, [])
+
+  const setId = (event) => setProduct({ ...product, id: event.target.value })
+  const setName = (event) => setProduct({ ...product, name: event.target.value })
+  const setCategory = (event) => setProduct({ ...product, category: event.target.value })
+  const setPrice = (event) => setProduct({ ...product, price: event.target.value })
+  const setSotck = (event) => setProduct({ ...product, stock: event.target.value })
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos&idCode=${product.id}&action=update`, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "content-Type": "application/json" },
+      body: JSON.stringify(product)
+    })
+    cambiarVista("Venta")
+  }
+
+  return (
+    <div className='contenedorForm'>
+      <h1 className='formTittle'>Modifica el producto</h1>
+      <form className='form' onSubmit={handleSubmit}>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setId} value={product.id} />
+          <span className='formText'> Código del producto </span>
+        </label>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setName} value={product.name} />
+          <span className='formText'> Nombre del producto </span>
+        </label>
+        <label className='formLabel'>
+          <select className='formInput' value={product.category} onChange={setCategory} autoComplete='off' required="on">
+            <option> - </option>
+            {categorias.map((categoria) => (
+              <option key={categoria.id}>{categoria.name}</option>
+            ))}
+          </select>
+          <span className='formText'> Categoría </span>
+        </label>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setPrice} value={product.price} />
+          <span className='formText'> Precio </span>
+        </label>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setSotck} value={product.stock} />
+          <span className='formText'> Stock </span>
+        </label>
+        <div className='contentBtonForms'>
+          <button className='btonAdd'> Guardar cambios </button>
+          <button onClick={() => cambiarVista("Venta")} type='button' className='btonBack'> Volver </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+function ProductGrid({ eliminarProducto, cambiarVista, seleccionarProducto, categoriaFiltro, busqueda }) {
   const [productos, setProductos] = useState([])
+  const [cargando, setCargado] = useState(true)
 
   useEffect(() => {
     async function getData() {
@@ -110,32 +201,55 @@ function ProductGrid({ eliminarProducto }) {
       })
       const response = await dataBase.json()
       setProductos(response.data)
+      setCargado(false)
     }
     getData()
   }, [])
 
+  const productosFiltrados = productos
+    .filter(p => categoriaFiltro === "Todos" || p.category === categoriaFiltro)
+    .filter(p => p.name.toLowerCase().includes(busqueda.toLowerCase()))
+
   return (
     <div className="product-grid">
-      {/* Faltan poner los prductos, aca esta el div y la clase para eso :D */}
-      {productos.map((producto) => {
-        return (
-          <div className='boxProduct' key={producto.id}>
-            <p className='textBox'> Producto: {producto.name}</p>
-            <p className='textBox'> Categría: {producto.category}</p>
-            <p className='textBox'> Stock: {producto.stock}</p>
-            <div className='btnesDisposi'>
-              <span className='contentPrice'> ${producto.price} COP</span>
-              <button className='btonPlus'> + </button>
+      {cargando &&
+        <div className='loader'>
+          <div className='spinner'></div>
+        </div>
+      }
+      {!cargando && productosFiltrados.length === 0 &&
+        <div className='isEmpetyCat'>
+          <p>No hay productos en esta categoría</p>
+        </div>
+      }
+      {!cargando &&
+        productosFiltrados.map((producto) => {
+          return (
+            <div className='boxProduct' key={producto.id}>
+              <p className='textBox'> Producto: {producto.name}</p>
+              <p className='textBox'> Categoría: {producto.category}</p>
+              <p className='textBox'> Stock: {producto.stock}</p>
+              <div className='btnesDisposi'>
+                <span className='contentPrice'> ${producto.price} COP</span>
+                <button className='btonPlus'> + </button>
+              </div>
+              <div className='btonesMoldearProdcuto'>
+                <button className='btonModifPorducto' onClick={() => {
+                  seleccionarProducto(producto)
+                  cambiarVista("modificarProducto")
+                }}>
+                  Modificar
+                </button>
+                <button className='btonDelProducto' onClick={() => eliminarProducto(producto.id)}>
+                  Eliminar
+                </button>
+              </div>
             </div>
-            <div className='btonesMoldearProdcuto'>
-              <button className='btonModifPorducto'> Modificar </button>
-              <button className='btonDelProducto' onClick={() => eliminarProducto(producto.id)}> Eliminar </button>
-            </div>
-          </div>
-        )
-      })}
+          )
+        })
+      }
     </div>
-  );
+  )
 }
 
 function Cart() {
@@ -175,7 +289,7 @@ function FormularioAgregarCategoria({ cambiarVista }) {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    fetch("https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=categorias", {
+    fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias", {
       method: "POST",
       mode: "no-cors",
       headers: { "content-Type": "application/json" },
@@ -217,7 +331,7 @@ function FormularioAgregarProducto({ cambiarVista }) {
 
   useEffect(() => {
     async function getData() {
-      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=categorias", {
+      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias", {
         method: "GET",
       })
       const response = await dataBase.json()
@@ -248,7 +362,7 @@ function FormularioAgregarProducto({ cambiarVista }) {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    fetch("https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=productos", {
+    fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos", {
       method: "POST",
       mode: "no-cors",
       headers: { "content-Type": "application/json" },
@@ -303,9 +417,9 @@ function FormularioEliminarCategoria({ cambiarVista }) {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("")
 
   function eliminarCategoria(idCode) {
-    fetch(`https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=categorias&idCode=${idCode}`, {
+    fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias&idCode=${idCode}&action=delete`, {
       method: "POST",
-      mode: "no-cors"
+      mode: "no-cors",
     })
 
     setCategoriaSeleccionada("")
@@ -315,7 +429,7 @@ function FormularioEliminarCategoria({ cambiarVista }) {
 
   useEffect(() => {
     async function getData() {
-      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=categorias", {
+      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias", {
         method: "GET",
       })
       const response = await dataBase.json()
@@ -348,13 +462,31 @@ function FormularioEliminarCategoria({ cambiarVista }) {
 function App() {
   const [vista, setVista] = useState("Venta")
 
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null)
+
+  const [categoriaFiltro, setCategoriaFiltro] = useState("Todos")
+
+  const [busqueda, setBusqueda] = useState("")
+
+  function cambiarBusquedaSeleccionada(nombre){
+    setBusqueda(nombre)
+  }
+
+  function cambiarCategoriaSeleccionada(categoria) {
+    setCategoriaFiltro(categoria)
+  }
+  function seleccionarProducto(producto) {
+    setProductoSeleccionado(producto)
+  }
+
   function cambiarVista(nuevaVista) {
     setVista(nuevaVista)
     console.log(`Venimos de: ${vista} y pasamos a ${nuevaVista}`)
   }
 
+
   async function eliminarProducto(idProducto) {
-    const deleteData = await fetch(`https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=productos&idCode=${idProducto}`, {
+    const deleteData = await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos&idCode=${idProducto}&action=delete`, {
       method: "POST",
       mode: "no-cors",
       body: JSON.stringify({})
@@ -372,9 +504,12 @@ function App() {
       {vista === "eliminarCategoria" &&
         <FormularioEliminarCategoria cambiarVista={cambiarVista} />
       }
+      {vista === "modificarProducto" &&
+        <FormModificarProducto cambiarVista={cambiarVista} producto={productoSeleccionado} />
+      }
       {vista === "Clientes" &&
         < div >
-          <Header cambiarVista={cambiarVista} valorVista={vista}/>
+          <Header cambiarVista={cambiarVista} valorVista={vista} />
           <div className="main-content">
             <div className="Historial de ventas">
               <ClientesGrid />
@@ -396,40 +531,40 @@ function App() {
       {
         vista === "Proveedores" &&
         < div >
-                <Header cambiarVista={cambiarVista} valorVista={vista}/>
-                <div className="main-content">
-                  <div className="Historial de ventas">
-                    <ProveedoresGrid />
-                  </div>
-                </div>
-              </div >
-            }
+          <Header cambiarVista={cambiarVista} valorVista={vista} />
+          <div className="main-content">
+            <div className="Historial de ventas">
+              <ProveedoresGrid />
+            </div>
+          </div>
+        </div >
+      }
       {
         vista === "Compras" &&
         < div >
-                <Header cambiarVista={cambiarVista} valorVista={vista}/>
-                <div className="main-content">
-                  <div className="Historial de ventas">
-                    <ComprasGrid />
-                  </div>
-                </div>
-              </div >
-            }
-{
-  vista === "Venta" &&
-  <div>
-    <Header cambiarVista={cambiarVista} valorVista={vista} />
-    <div className="main-content">
-      <div className="catalogo">
-        <ActionsBarVenta cambiarVista={cambiarVista} />
-        <ProductGrid eliminarProducto={eliminarProducto} />
-      </div>
-      <div>
-        <Cart />
-      </div>
-    </div>
-  </div>
-}
+          <Header cambiarVista={cambiarVista} valorVista={vista} />
+          <div className="main-content">
+            <div className="Historial de ventas">
+              <ComprasGrid />
+            </div>
+          </div>
+        </div >
+      }
+      {
+        vista === "Venta" &&
+        <div>
+          <Header cambiarVista={cambiarVista} valorVista={vista} />
+          <div className="main-content">
+            <div className="catalogo">
+              <ActionsBarVenta cambiarVista={cambiarVista} setCategoriaFiltro={cambiarCategoriaSeleccionada} busqueda={cambiarBusquedaSeleccionada} setBusqueda={cambiarBusquedaSeleccionada} />
+              <ProductGrid eliminarProducto={eliminarProducto} cambiarVista={cambiarVista} seleccionarProducto={seleccionarProducto} categoriaFiltro={categoriaFiltro} busqueda={busqueda} />
+            </div>
+            <div>
+              <Cart />
+            </div>
+          </div>
+        </div>
+      }
     </div >
   );
 }
