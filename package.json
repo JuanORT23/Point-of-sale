@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/JuanORT23/Point-of-sale/issues"
   },
-  "homepage": "https://github.com/JuanORT23/Point-of-sale#readme"
+  "homepage": "https://github.com/JuanORT23/Point-of-sale#readme",
+  "dependencies": {
+    "react-hot-toast": "^2.6.0"
+  }
 }

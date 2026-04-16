@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import toast, { Toaster } from 'react-hot-toast'
 import './App.css'
 import './styles.css'
 
@@ -141,15 +142,20 @@ function FormModificarProducto({ cambiarVista, producto }) {
   const setPrice = (event) => setProduct({ ...product, price: event.target.value })
   const setSotck = (event) => setProduct({ ...product, stock: event.target.value })
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos&idCode=${product.id}&action=update`, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "content-Type": "application/json" },
-      body: JSON.stringify(product)
-    })
-    cambiarVista("Venta")
+  const handleSubmit = async (event) => {
+    try {
+      event.preventDefault()
+      fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos&idCode=${product.id}&action=update`, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "content-Type": "application/json" },
+        body: JSON.stringify(product)
+      })
+      cambiarVista("Venta")
+      toast.success("Producto modificado correctamente")
+    } catch (error) {
+      toast.error("Error al modificar")
+    }
   }
 
   return (
@@ -190,7 +196,7 @@ function FormModificarProducto({ cambiarVista, producto }) {
   )
 }
 
-function ProductGrid({ eliminarProducto, cambiarVista, seleccionarProducto, categoriaFiltro, busqueda }) {
+function ProductGrid({ eliminarProducto, cambiarVista, seleccionarProducto, categoriaFiltro, busqueda, refrescar }) {
   const [productos, setProductos] = useState([])
   const [cargando, setCargado] = useState(true)
 
@@ -204,7 +210,7 @@ function ProductGrid({ eliminarProducto, cambiarVista, seleccionarProducto, cate
       setCargado(false)
     }
     getData()
-  }, [])
+  }, [refrescar])
 
   const productosFiltrados = productos
     .filter(p => categoriaFiltro === "Todos" || p.category === categoriaFiltro)
@@ -287,15 +293,20 @@ function FormularioAgregarCategoria({ cambiarVista }) {
     setCategoria({ ...categoria, name: event.target.value })
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias", {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "content-Type": "application/json" },
-      body: JSON.stringify(categoria)
-    })
-    setCategoria({ ...categoria, name: "", id: "" })
+    try {
+      fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "content-Type": "application/json" },
+        body: JSON.stringify(categoria)
+      })
+      setCategoria({ ...categoria, name: "", id: "" })
+      toast.success("Categoria agregada con exito")
+    } catch (error) {
+      toast.error("Error al agregar categoria")
+    }
   }
   return (
     <div className='contenedorForm'>
@@ -360,18 +371,21 @@ function FormularioAgregarProducto({ cambiarVista }) {
     setProduct({ ...product, stock: event.target.value })
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos", {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "content-Type": "application/json" },
-      body: JSON.stringify(product)
-    })
-
-    setProduct({ ...product, id: "", name: "", category: "", price: 0, stock: 0 })
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "content-Type": "application/json" },
+        body: JSON.stringify(product)
+      })
+      toast.success("Producto agregado correctamente")
+      setProduct({ id: "", name: "", category: "", price: 0, stock: 0 })
+    } catch (error) {
+      toast.error("Error al agregar el producto")
+    }
   }
-
   return (
     <div className='contenedorForm'>
       <h1 className='formTittle'>Describe el nuevo producto</h1>
@@ -416,13 +430,19 @@ function FormularioEliminarCategoria({ cambiarVista }) {
 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("")
 
-  function eliminarCategoria(idCode) {
-    fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias&idCode=${idCode}&action=delete`, {
-      method: "POST",
-      mode: "no-cors",
-    })
+  const [cargando, setCargado] = useState(true)
 
-    setCategoriaSeleccionada("")
+  async function eliminarCategoria(idCode) {
+    try {
+      fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias&idCode=${idCode}&action=delete`, {
+        method: "POST",
+        mode: "no-cors",
+      })
+      toast.success("Categoria eliminada correctamente")
+      setCategoriaSeleccionada("")
+    } catch (error) {
+      toast.error("Error al eliminar categoria")
+    }
   }
 
   const [categorias, setCategorias] = useState([])
@@ -434,6 +454,7 @@ function FormularioEliminarCategoria({ cambiarVista }) {
       })
       const response = await dataBase.json()
       setCategorias(response.data)
+      setCargado(false)
     }
     getData()
   }, [])
@@ -441,20 +462,27 @@ function FormularioEliminarCategoria({ cambiarVista }) {
   return (
     <div className='contenedorForm'>
       <h1 className='formTittle'> Seleccione la categoría que desea eliminar </h1>
-      <form className='form' onSubmit={() => eliminarCategoria(categoriaSeleccionada)}>
-        {categorias.map((categoria) => {
-          return (
-            <label key={categoria.id}>
-              <input type="radio" name="categorias" value={categoria.id} onChange={(event) => setCategoriaSeleccionada(event.target.value)} checked={categoriaSeleccionada == String(categoria.id)} />
-              {categoria.name}
-            </label>
-          )
-        })}
-        <div className='contentBtonForms'>
-          <button className='btonAdd '> Eliminar </button>
-          <button className='btonBack' type='button' onClick={() => cambiarVista("Venta")}> Volver </button>
+      {cargando &&
+        <div className='loader'>
+          <div className='spinner'></div>
         </div>
-      </form>
+      }
+      {!cargando &&
+        <form className='form'>
+          {categorias.map((categoria) => {
+            return (
+              <label key={categoria.id}>
+                <input type="radio" name="categorias" value={categoria.id} onChange={(event) => setCategoriaSeleccionada(event.target.value)} checked={categoriaSeleccionada == String(categoria.id)} />
+                {categoria.name}
+              </label>
+            )
+          })}
+        </form>
+      }
+      <div className='contentBtonForms'>
+        <button className='btonAdd ' onClick={() => eliminarCategoria(categoriaSeleccionada)}> Eliminar </button>
+        <button className='btonBack' type='button' onClick={() => cambiarVista("Venta")}> Volver </button>
+      </div>
     </div>
   )
 }
@@ -468,7 +496,13 @@ function App() {
 
   const [busqueda, setBusqueda] = useState("")
 
-  function cambiarBusquedaSeleccionada(nombre){
+  const [refrescar, setRefrescar] = useState(false)
+
+  function refrescarComp() {
+    setRefrescar(!refrescar)
+  }
+
+  function cambiarBusquedaSeleccionada(nombre) {
     setBusqueda(nombre)
   }
 
@@ -486,86 +520,94 @@ function App() {
 
 
   async function eliminarProducto(idProducto) {
-    const deleteData = await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos&idCode=${idProducto}&action=delete`, {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify({})
-    })
-    console.log(deleteData)
+    try {
+      const deleteData = await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos&idCode=${idProducto}&action=delete`, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify({})
+      })
+      refrescarComp()
+      toast.success("Producto eliminado correctamente")
+    } catch (error) {
+      toast.error("Error al eliminar producto")
+    }
   }
   return (
-    <div className="app-container">
-      {vista === "agregarProducto" &&
-        <FormularioAgregarProducto cambiarVista={cambiarVista} />
-      }
-      {vista === "agregarCategoria" &&
-        <FormularioAgregarCategoria cambiarVista={cambiarVista} />
-      }
-      {vista === "eliminarCategoria" &&
-        <FormularioEliminarCategoria cambiarVista={cambiarVista} />
-      }
-      {vista === "modificarProducto" &&
-        <FormModificarProducto cambiarVista={cambiarVista} producto={productoSeleccionado} />
-      }
-      {vista === "Clientes" &&
-        < div >
-          <Header cambiarVista={cambiarVista} valorVista={vista} />
-          <div className="main-content">
-            <div className="Historial de ventas">
-              <ClientesGrid />
+    <>
+      <Toaster position="top-center" />
+      <div className="app-container">
+        {vista === "agregarProducto" &&
+          <FormularioAgregarProducto cambiarVista={cambiarVista} />
+        }
+        {vista === "agregarCategoria" &&
+          <FormularioAgregarCategoria cambiarVista={cambiarVista} />
+        }
+        {vista === "eliminarCategoria" &&
+          <FormularioEliminarCategoria cambiarVista={cambiarVista} />
+        }
+        {vista === "modificarProducto" &&
+          <FormModificarProducto cambiarVista={cambiarVista} producto={productoSeleccionado} />
+        }
+        {vista === "Clientes" &&
+          < div >
+            <Header cambiarVista={cambiarVista} valorVista={vista} />
+            <div className="main-content">
+              <div className="Historial de ventas">
+                <ClientesGrid />
+              </div>
             </div>
           </div>
-        </div>
-      }
-      {
-        vista === "Historial de ventas" &&
-        <div>
-          <Header cambiarVista={cambiarVista} valorVista={vista} />
-          <div className="main-content">
-            <div className="Historial de ventas">
-              <HistorialVentasGrid />
+        }
+        {
+          vista === "Historial de ventas" &&
+          <div>
+            <Header cambiarVista={cambiarVista} valorVista={vista} />
+            <div className="main-content">
+              <div className="Historial de ventas">
+                <HistorialVentasGrid />
+              </div>
             </div>
           </div>
-        </div>
-      }
-      {
-        vista === "Proveedores" &&
-        < div >
-          <Header cambiarVista={cambiarVista} valorVista={vista} />
-          <div className="main-content">
-            <div className="Historial de ventas">
-              <ProveedoresGrid />
+        }
+        {
+          vista === "Proveedores" &&
+          < div >
+            <Header cambiarVista={cambiarVista} valorVista={vista} />
+            <div className="main-content">
+              <div className="Historial de ventas">
+                <ProveedoresGrid />
+              </div>
+            </div>
+          </div >
+        }
+        {
+          vista === "Compras" &&
+          < div >
+            <Header cambiarVista={cambiarVista} valorVista={vista} />
+            <div className="main-content">
+              <div className="Historial de ventas">
+                <ComprasGrid />
+              </div>
+            </div>
+          </div >
+        }
+        {
+          vista === "Venta" &&
+          <div>
+            <Header cambiarVista={cambiarVista} valorVista={vista} />
+            <div className="main-content">
+              <div className="catalogo">
+                <ActionsBarVenta cambiarVista={cambiarVista} setCategoriaFiltro={cambiarCategoriaSeleccionada} busqueda={cambiarBusquedaSeleccionada} setBusqueda={cambiarBusquedaSeleccionada} />
+                <ProductGrid eliminarProducto={eliminarProducto} cambiarVista={cambiarVista} seleccionarProducto={seleccionarProducto} categoriaFiltro={categoriaFiltro} busqueda={busqueda} refrescar={refrescar} />
+              </div>
+              <div>
+                <Cart />
+              </div>
             </div>
           </div>
-        </div >
-      }
-      {
-        vista === "Compras" &&
-        < div >
-          <Header cambiarVista={cambiarVista} valorVista={vista} />
-          <div className="main-content">
-            <div className="Historial de ventas">
-              <ComprasGrid />
-            </div>
-          </div>
-        </div >
-      }
-      {
-        vista === "Venta" &&
-        <div>
-          <Header cambiarVista={cambiarVista} valorVista={vista} />
-          <div className="main-content">
-            <div className="catalogo">
-              <ActionsBarVenta cambiarVista={cambiarVista} setCategoriaFiltro={cambiarCategoriaSeleccionada} busqueda={cambiarBusquedaSeleccionada} setBusqueda={cambiarBusquedaSeleccionada} />
-              <ProductGrid eliminarProducto={eliminarProducto} cambiarVista={cambiarVista} seleccionarProducto={seleccionarProducto} categoriaFiltro={categoriaFiltro} busqueda={busqueda} />
-            </div>
-            <div>
-              <Cart />
-            </div>
-          </div>
-        </div>
-      }
-    </div >
+        }
+      </div >
+    </>
   );
 }
 
