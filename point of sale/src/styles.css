@@ -340,6 +340,7 @@ button{
   animation: girar 0.8s linear infinite;
 }
 
+/* PROOVEEDORES GRID*/
 @keyframes girar {
   to { transform: rotate(360deg); }
 }

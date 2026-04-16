@@ -58,8 +58,8 @@ function ClientesGrid() {
 
 function ProveedoresGrid() {
   return (
-    <div>
-
+    <div className='proveedoresGrid'>
+      
     </div>
   )
 }
