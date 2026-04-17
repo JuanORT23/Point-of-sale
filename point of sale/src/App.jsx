@@ -18,26 +18,26 @@ function Header({ cambiarVista, valorVista }) {
 
   return (
     <div className="header">
-  <div className="header-logo">
-    <img src={logo} alt="Logo Papelería Papel y Luna" />
-    <h1>Papelería Papel y Luna</h1>
-  </div>
+      <div className="header-logo">
+        <img src={logo} alt="Logo Papelería Papel y Luna" />
+        <h1>Papelería Papel y Luna</h1>
+      </div>
 
-  <div className="header-tabs">
-    {tabs.map((tab) => (
-      <button
-        key={tab}
-        className={`header-tab ${tabActivo === tab ? "tab-activo" : ""}`}
-        onClick={() => {
-          setTabActivo(tab)
-          cambiarVista(tab)
-        }}
-      >
-        {tab.toUpperCase()}
-      </button>
-    ))}
-  </div>
-</div>
+      <div className="header-tabs">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            className={`header-tab ${tabActivo === tab ? "tab-activo" : ""}`}
+            onClick={() => {
+              setTabActivo(tab)
+              cambiarVista(tab)
+            }}
+          >
+            {tab.toUpperCase()}
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -60,24 +60,174 @@ function HistorialVentasGrid() {
   )
 }
 
-function ClientesGrid() {
+function ClientesGrid({ cambiarVista, eliminarCliente, refrescar, seleccionaClienter }) {
+  const [clientes, setClientes] = useState([])
+  const [cargando, setCargando] = useState(true)
+  const [busqueda, setBusqueda] = useState("")
+
+  useEffect(() => {
+    async function getData() {
+      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=clientes", {
+        method: "GET"
+      })
+      const response = await dataBase.json()
+      setClientes(response.data)
+      setCargando(false)
+    }
+    getData()
+  }, [refrescar])
+
+  const clientesFiltrados = clientes.filter(c =>
+    c.name.toLowerCase().includes(busqueda.toLowerCase())
+  )
+
   return (
     <div className="recuadro">
-
       <div className="actions-bar">
         <h2>Clientes</h2>
         <div className="actions-container">
-          <button className="btn green">+ Agregar Cliente</button>
-          <select className="category-select">
-            <option>Todos</option>
-          </select>
+          <input
+            type="text"
+            placeholder="Buscar Cliente"
+            className="search-input"
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+          <button className="btn green" onClick={() => cambiarVista("agregarClientes")}>+ Agregar Cliente</button>
         </div>
       </div>
 
       <div className="recuadro-grid">
-        {/* Aqui toca meter los clientes con backend porfaaaaaaa */}
+        {cargando &&
+          <div className='loader'>
+            <div className='spinner'></div>
+          </div>
+        }
+        {!cargando && clientesFiltrados.length === 0 &&
+          <div className='isEmpetyCat'>
+            <p>No hay clientes registrados</p>
+          </div>
+        }
+        {!cargando &&
+          clientesFiltrados.map((cliente) => (
+            <div className='boxProduct' key={cliente.id}>
+              <p className='textBox'>ID: {cliente.id}</p>
+              <p className='textBox'>Nombre: {cliente.name}</p>
+              <p className='textBox'>Dirección: {cliente.address}</p>
+              <div className='btonesMoldearProdcuto'>
+                <button className='btonModifPorducto' onClick={() => {
+                  seleccionaClienter(cliente)
+                  cambiarVista("modifcarCliente")
+                }}>Modificar</button>
+                <button className='btonDelProducto' onClick={() => eliminarCliente(cliente.id, "clientes")}>Eliminar</button>
+              </div>
+            </div>
+          ))
+        }
       </div>
+    </div>
+  )
+}
 
+function FormModificarCliente({ cambiarVista, cliente }) {
+  const [clienteData, setClienteData] = useState({
+    id: cliente.id || "",
+    name: cliente.name || "",
+    address: cliente.address || ""
+  })
+
+  const setId = (event) => setClienteData({ ...clienteData, id: event.target.value })
+  const setName = (event) => setClienteData({ ...clienteData, name: event.target.value })
+  const setAddress = (event) => setClienteData({ ...clienteData, address: event.target.value })
+
+  const handleSubmit = async (event) => {
+    try {
+      event.preventDefault()
+      await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=clientes&idCode=${clienteData.id}&action=update`, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "content-Type": "application/json" },
+        body: JSON.stringify(clienteData)
+      })
+      toast.success("Cliente modificado correctamente")
+      cambiarVista("Clientes")
+    } catch (error) {
+      toast.error("Error al modificar el cliente")
+    }
+  }
+
+  return (
+    <div className='contenedorForm'>
+      <h1 className='formTittle'>Modificar cliente</h1>
+      <form className='form' onSubmit={handleSubmit}>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setId} value={clienteData.id} />
+          <span className='formText'> Número de identificación </span>
+        </label>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setName} value={clienteData.name} />
+          <span className='formText'> Nombre del cliente </span>
+        </label>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setAddress} value={clienteData.address} />
+          <span className='formText'> Dirección </span>
+        </label>
+        <div className='contentBtonForms'>
+          <button className='btonAdd'> Guardar cambios </button>
+          <button onClick={() => cambiarVista("Clientes")} type='button' className='btonBack'> Volver </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+function FormAgregarCliente({ cambiarVista }) {
+  const [cliente, setCliente] = useState({
+    id: "",
+    name: "",
+    address: ""
+  })
+
+  const setId = (event) => setCliente({ ...cliente, id: event.target.value })
+  const setName = (event) => setCliente({ ...cliente, name: event.target.value })
+  const setAddress = (event) => setCliente({ ...cliente, address: event.target.value })
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=clientes", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "content-Type": "application/json" },
+        body: JSON.stringify(cliente)
+      })
+      toast.success("Cliente agregado correctamente")
+      setCliente({ id: "", name: "", address: "" })
+    } catch (error) {
+      toast.error("Error al agregar el cliente")
+    }
+  }
+
+  return (
+    <div className='contenedorForm'>
+      <h1 className='formTittle'>Registrar nuevo cliente</h1>
+      <form className='form' onSubmit={handleSubmit}>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setId} value={cliente.id} />
+          <span className='formText'> Ingresa el número de identificación </span>
+        </label>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setName} value={cliente.name} />
+          <span className='formText'> Ingresa el nombre del cliente </span>
+        </label>
+        <label className='formLabel'>
+          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setAddress} value={cliente.address} />
+          <span className='formText'> Ingresa la dirección del cliente </span>
+        </label>
+        <div className='contentBtonForms'>
+          <button className='btonAdd'> Crear </button>
+          <button onClick={() => cambiarVista("Venta")} type='button' className='btonBack'> Volver </button>
+        </div>
+      </form>
     </div>
   )
 }
@@ -299,7 +449,7 @@ function ProductGrid({ eliminarProducto, cambiarVista, seleccionarProducto, cate
                 }}>
                   Modificar
                 </button>
-                <button className='btonDelProducto' onClick={() => eliminarProducto(producto.id)}>
+                <button className='btonDelProducto' onClick={() => eliminarProducto(producto.id, "productos")}>
                   Eliminar
                 </button>
               </div>
@@ -543,7 +693,7 @@ function FormularioEliminarCategoria({ cambiarVista }) {
 function App() {
   const [vista, setVista] = useState("Venta")
 
-  const [productoSeleccionado, setProductoSeleccionado] = useState(null)
+  const [entidadSeleccionada, setEntidadSeleccionada] = useState(null)
 
   const [categoriaFiltro, setCategoriaFiltro] = useState("Todos")
 
@@ -562,8 +712,8 @@ function App() {
   function cambiarCategoriaSeleccionada(categoria) {
     setCategoriaFiltro(categoria)
   }
-  function seleccionarProducto(producto) {
-    setProductoSeleccionado(producto)
+  function seleccionarEntidad(entidad) {
+    setEntidadSeleccionada(entidad)
   }
 
   function cambiarVista(nuevaVista) {
@@ -572,9 +722,9 @@ function App() {
   }
 
 
-  async function eliminarProducto(idProducto) {
+  async function eliminarEntidad(idCode, resource) {
     try {
-      const deleteData = await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos&idCode=${idProducto}&action=delete`, {
+      const deleteData = await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=${resource}&idCode=${idCode}&action=delete`, {
         method: "POST",
         mode: "no-cors",
         body: JSON.stringify({})
@@ -589,6 +739,12 @@ function App() {
     <>
       <Toaster position="top-center" />
       <div className="app-container">
+        {vista === "modifcarCliente" &&
+          <FormModificarCliente cambiarVista={cambiarVista} cliente={entidadSeleccionada} />
+        }
+        {vista === "agregarClientes" &&
+          <FormAgregarCliente cambiarVista={cambiarVista} />
+        }
         {vista === "agregarProducto" &&
           <FormularioAgregarProducto cambiarVista={cambiarVista} />
         }
@@ -599,14 +755,14 @@ function App() {
           <FormularioEliminarCategoria cambiarVista={cambiarVista} />
         }
         {vista === "modificarProducto" &&
-          <FormModificarProducto cambiarVista={cambiarVista} producto={productoSeleccionado} />
+          <FormModificarProducto cambiarVista={cambiarVista} producto={entidadSeleccionada} />
         }
         {vista === "Clientes" &&
           < div >
             <Header cambiarVista={cambiarVista} valorVista={vista} />
             <div className="main-content">
               <div className="Historial de ventas">
-                <ClientesGrid />
+                <ClientesGrid cambiarVista={cambiarVista} eliminarCliente={eliminarEntidad} refrescar={refrescar} seleccionaClienter={seleccionarEntidad} />
               </div>
             </div>
           </div>
@@ -651,7 +807,7 @@ function App() {
             <div className="main-content">
               <div className="catalogo">
                 <ActionsBarVenta cambiarVista={cambiarVista} setCategoriaFiltro={cambiarCategoriaSeleccionada} busqueda={cambiarBusquedaSeleccionada} setBusqueda={cambiarBusquedaSeleccionada} />
-                <ProductGrid eliminarProducto={eliminarProducto} cambiarVista={cambiarVista} seleccionarProducto={seleccionarProducto} categoriaFiltro={categoriaFiltro} busqueda={busqueda} refrescar={refrescar} />
+                <ProductGrid eliminarProducto={eliminarEntidad} cambiarVista={cambiarVista} seleccionarProducto={seleccionarEntidad} categoriaFiltro={categoriaFiltro} busqueda={busqueda} refrescar={refrescar} />
               </div>
               <div>
                 <Cart />
