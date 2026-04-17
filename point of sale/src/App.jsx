@@ -473,7 +473,7 @@ function ComprasGrid({ cambiarVista, seleccionarCompra }) {
             <div className='boxProduct' key={compra.precio}>
               <p className='textBox'>Proveedor: {compra.proveedor}</p>
               <p className='textBox'>Producto: {compra.producto}</p>
-              <p className='textBox'>Precio: {compra.precio}</p>
+              <p className='textBox'>Precio: ${compra.precio}COP</p>
               <p className='textBox'>Cantidad: {compra.cantidad}</p>
               <p className='textBox'> Fecha: {new Date(compra.fecha).toLocaleDateString("es-CO")}</p>
               <div className='btonesMoldearProdcuto'>
