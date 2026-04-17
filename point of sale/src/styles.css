@@ -11,7 +11,7 @@ body {
   display: flex;
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: 100px;
+  gap: 20px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -74,13 +74,15 @@ body {
 }
 
 .recuadro {
-  margin-top: 20px ;
-  width: 800px;
-  height: 700px;
+  margin-top: 20px;
+  width: 100%;
+  height: auto;        
+  min-height: 700px;   
   padding: 20px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 .recuadro-grid {
   height: 80%;
@@ -392,6 +394,9 @@ button {
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+  .recuadro-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 1024px) {
@@ -402,6 +407,10 @@ button {
   .catalogo {
     width: 100%;
     height: auto;
+  }
+
+  .recuadro {
+    min-height: auto;  /* En tablet no forzamos altura mínima */
   }
 
   .cart {
@@ -420,14 +429,28 @@ button {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .recuadro-grid {
+    grid-template-columns: repeat(2, 1fr);  /* 2 columnas en móvil */
+  }
+
   .header {
     flex-direction: column;
     align-items: flex-start;
     padding-bottom: 0;
+    gap: 8px;    /* Menos gap cuando se apila verticalmente */
+  }
+
+  .header-logo h1 {
+    font-size: 18px;  /* Título más pequeño en móvil para que no desborde */
   }
 
   .header-tabs {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: auto;        /* Scroll horizontal si los tabs no caben */
+    scrollbar-width: none;   /* Oculta el scrollbar en Firefox */
+  }
+
+  .header-tabs::-webkit-scrollbar {
+    display: none;  /* Oculta el scrollbar en Chrome */
   }
 }
