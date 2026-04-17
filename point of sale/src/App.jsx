@@ -142,7 +142,7 @@ function FormModificarCliente({ cambiarVista, cliente }) {
   const handleSubmit = async (event) => {
     try {
       event.preventDefault()
-      await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=clientes&idCode=${cliente.id}&action=update`, {
+      await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=clientes&idCode=${clienteData.id}&action=update`, {
         method: "POST",
         mode: "no-cors",
         headers: { "content-Type": "application/json" },
@@ -202,7 +202,6 @@ function FormAgregarCliente({ cambiarVista }) {
       })
       toast.success("Cliente agregado correctamente")
       setCliente({ id: "", name: "", address: "" })
-      cambiarVista("Clientes")
     } catch (error) {
       toast.error("Error al agregar el cliente")
     }
@@ -233,427 +232,43 @@ function FormAgregarCliente({ cambiarVista }) {
   )
 }
 
-function ProveedoresGrid({ cambiarVista, seleccionarProveedor, refrescar, eliminarProveedor }) {
-  const [proveedores, setProveedores] = useState([])
-  const [cargando, setCargando] = useState(true)
-  const [busqueda, setBusqueda] = useState("")
-
-  useEffect(() => {
-    async function getData() {
-      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=proveedores", {
-        method: "GET"
-      })
-      const response = await dataBase.json()
-      setProveedores(response.data)
-      setCargando(false)
-    }
-    getData()
-  }, [refrescar])
-
-  const proveedoresFiltrados = proveedores.filter(p =>
-    p.address.toLowerCase().includes(busqueda.toLowerCase())
-  )
-
+function ProveedoresGrid() {
   return (
     <div className="recuadro">
+
       <div className="actions-bar">
         <h2>Proveedores</h2>
         <div className="actions-container">
-          <input
-            type="text"
-            placeholder="Buscar por dirección"
-            className="search-input"
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-          <button className="btn green" onClick={() => cambiarVista("agregarProveedor")}>+ Agregar producto</button>
+          <button className="btn green">+ Agregar Proveedor</button>
+          <select className="category-select">
+            <option>Todos</option>
+          </select>
         </div>
       </div>
 
       <div className="recuadro-grid">
-        {cargando &&
-          <div className='loader'>
-            <div className='spinner'></div>
-          </div>
-        }
-        {!cargando && proveedoresFiltrados.length === 0 &&
-          <div className='isEmpetyCat'>
-            <p>No hay proveedores registrados</p>
-          </div>
-        }
-        {!cargando &&
-          proveedoresFiltrados.map((proveedor) => (
-            <div className='boxProduct' key={proveedor.id}>
-              <p className='textBox'>ID: {proveedor.id}</p>
-              <p className='textBox'>Nombre: {proveedor.name}</p>
-              <p className='textBox'>Dirección: {proveedor.address}</p>
-              <div className='btonesMoldearProdcuto'>
-                <button className='btonModifPorducto' onClick={() => {
-                  seleccionarProveedor(proveedor)
-                  cambiarVista("modificarProveedor")
-                }}>
-                  Modificar
-                </button>
-                <button className='btonDelProducto' onClick={() => eliminarProveedor(proveedor.id, "proveedores")} >
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          ))
-        }
+        {/* LO MISMOOOOO, llenar los proveedores con backend acaaaa */}
       </div>
+
     </div>
   )
 }
 
-function FormAgregarProveedor({ cambiarVista }) {
-  const [proveedor, setProveedor] = useState({
-    id: "",
-    name: "",
-    address: ""
-  })
-
-  const setId = (event) => setProveedor({ ...proveedor, id: event.target.value })
-  const setName = (event) => setProveedor({ ...proveedor, name: event.target.value })
-  const setAddress = (event) => setProveedor({ ...proveedor, address: event.target.value })
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=proveedores", {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "content-Type": "application/json" },
-        body: JSON.stringify(proveedor)
-      })
-      toast.success("Proveedor agregado correctamente")
-      setProveedor({ id: "", name: "", address: "" })
-      cambiarVista("Proveedores")
-    } catch (error) {
-      toast.error("Error al agregar el proveedor")
-    }
-  }
-
-  return (
-    <div className='contenedorForm'>
-      <h1 className='formTittle'>Registrar nuevo proveedor</h1>
-      <form className='form' onSubmit={handleSubmit}>
-        <label className='formLabel'>
-          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setId} value={proveedor.id} />
-          <span className='formText'> Ingresa el número NIT </span>
-        </label>
-        <label className='formLabel'>
-          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setName} value={proveedor.name} />
-          <span className='formText'> Ingresa el nombre del proveedor </span>
-        </label>
-        <label className='formLabel'>
-          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setAddress} value={proveedor.address} />
-          <span className='formText'> Ingresa la dirección del proveedor </span>
-        </label>
-        <div className='contentBtonForms'>
-          <button className='btonAdd'> Crear </button>
-          <button onClick={() => cambiarVista("Venta")} type='button' className='btonBack'> Volver </button>
-        </div>
-      </form>
-    </div>
-  )
-}
-
-function FormModificarProveedor({ cambiarVista, proveedor }) {
-  const [proveedorData, setProveedorData] = useState({
-    id: proveedor.id || "",
-    name: proveedor.name || "",
-    address: proveedor.address || ""
-  })
-
-  const setId = (event) => setProveedorData({ ...proveedorData, id: event.target.value })
-  const setName = (event) => setProveedorData({ ...proveedorData, name: event.target.value })
-  const setAddress = (event) => setProveedorData({ ...proveedorData, address: event.target.value })
-
-  const handleSubmit = async (event) => {
-    try {
-      event.preventDefault()
-      await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=proveedores&idCode=${proveedor.id}&action=update`, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "content-Type": "application/json" },
-        body: JSON.stringify(proveedorData)
-      })
-      toast.success("Proveedor modificado correctamente")
-      cambiarVista("Proveedores")
-    } catch (error) {
-      toast.error("Error al modificar el proveedor")
-    }
-  }
-
-  return (
-    <div className='contenedorForm'>
-      <h1 className='formTittle'>Modificar proveedor</h1>
-      <form className='form' onSubmit={handleSubmit}>
-        <label className='formLabel'>
-          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setId} value={proveedorData.id} />
-          <span className='formText'> Número de identificación </span>
-        </label>
-        <label className='formLabel'>
-          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setName} value={proveedorData.name} />
-          <span className='formText'> Nombre del proveedor </span>
-        </label>
-        <label className='formLabel'>
-          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setAddress} value={proveedorData.address} />
-          <span className='formText'> Dirección </span>
-        </label>
-        <div className='contentBtonForms'>
-          <button className='btonAdd'> Guardar cambios </button>
-          <button onClick={() => cambiarVista("Proveedores")} type='button' className='btonBack'> Volver </button>
-        </div>
-      </form>
-    </div>
-  )
-}
-
-function ComprasGrid({ cambiarVista, seleccionarCompra }) {
-  const [compras, setCompras] = useState([])
-  const [proveedores, setProveedores] = useState([])
-  const [cargando, setCargando] = useState(true)
-  const [filtro, setFiltro] = useState("Todos")
-
-  useEffect(() => {
-    async function getData() {
-      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=compras", {
-        method: "GET",
-      })
-      const response = await dataBase.json()
-      setCompras(response.data)
-      setCargando(false)
-    }
-    getData()
-  }, [])
-
-  useEffect(() => {
-    async function getData() {
-      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=proveedores", {
-        method: "GET",
-      })
-      const response = await dataBase.json()
-      setProveedores(response.data)
-    }
-    getData()
-  }, [])
-
-  const comprasFiltradas = filtro === "Todos"
-    ? compras
-    : compras.filter((compra) => compra.proveedor === filtro)
-
+function ComprasGrid() {
   return (
     <div className="recuadro">
       <div className="actions-bar">
         <h2>Compras</h2>
         <div className="actions-container">
-          <select className="category-select" value={filtro} onChange={(e) => setFiltro(e.target.value)}>
+          <select className="category-select">
             <option>Todos</option>
-            {proveedores.map((proveedor) => (
-              <option key={proveedor.id}>{proveedor.name}</option>
-            ))}
           </select>
-          <button className="btn green" onClick={() => cambiarVista("agregarCompra")}>+ Agregar Compra</button>
         </div>
       </div>
       <div className="recuadro-grid">
-        {cargando &&
-          <div className='loader'>
-            <div className='spinner'></div>
-          </div>
-        }
-        {!cargando && comprasFiltradas.length === 0 &&
-          <div className='isEmpetyCat'>
-            <p>No hay compras registradas</p>
-          </div>
-        }
-        {!cargando &&
-          comprasFiltradas.map((compra) => (
-            <div className='boxProduct' key={compra.precio}>
-              <p className='textBox'>Proveedor: {compra.proveedor}</p>
-              <p className='textBox'>Producto: {compra.producto}</p>
-              <p className='textBox'>Precio: {compra.precio}</p>
-              <p className='textBox'>Cantidad: {compra.cantidad}</p>
-              <p className='textBox'> Fecha: {new Date(compra.fecha).toLocaleDateString("es-CO")}</p>
-              <div className='btonesMoldearProdcuto'>
-                <button className='btonModifPorducto' onClick={() => {
-                  seleccionarCompra(compra)
-                  cambiarVista("modificarCompra")
-                }}>Modificar</button>
-              </div>
-            </div>
-          ))
-        }
+        {/* LAS COmpras la llenas con backeeeend */}
       </div>
-    </div>
-  )
-}
 
-
-function FormAgregarCompra({ cambiarVista }) {
-  const [compra, setCompra] = useState({
-    proveedor: "",
-    producto: "",
-    precio: 0,
-    cantidad: 0,
-    fecha: ""
-  })
-
-  const [proveedores, setProveedores] = useState([])
-
-  useEffect(() => {
-    async function getData() {
-      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=proveedores", {
-        method: "GET",
-      })
-      const response = await dataBase.json()
-      setProveedores(response.data)
-    }
-    getData()
-  }, [])
-
-  const setProveedor = (event) => setCompra({ ...compra, proveedor: event.target.value })
-  const setProducto = (event) => setCompra({ ...compra, producto: event.target.value })
-  const setPrecio = (event) => setCompra({ ...compra, precio: event.target.value })
-  const setCantidad = (event => setCompra({ ...compra, cantidad: event.target.value }))
-  const setFecha = (event) => setCompra({ ...compra, fecha: event.target.value })
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=compras", {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "content-Type": "application/json" },
-        body: JSON.stringify(compra)
-      })
-      toast.success("Compra agregada correctamente")
-      setCompra({ proveedor: "", producto: "", precio: 0, cantidad: 0, fecha: "" })
-      cambiarVista("Compras")
-    } catch (error) {
-      toast.error("Error al agregar la compra")
-    }
-  }
-
-  return (
-    <div className='contenedorForm'>
-      <h1 className='formTittle'>Registrar nueva compra</h1>
-      <form className='form' onSubmit={handleSubmit}>
-        <label className='formLabel'>
-          <select className='formInput' value={compra.proveedor} onChange={setProveedor} required="on">
-            <option> - </option>
-            {proveedores.map((proveedor) => (
-              <option key={proveedor.id}>{proveedor.name}</option>
-            ))}
-          </select>
-          <span className='formText'> Seleccione un proveedor </span>
-        </label>
-        <label className='formLabel'>
-          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setProducto} value={compra.producto} />
-          <span className='formText'> Ingresa el producto </span>
-        </label>
-        <label className='formLabel'>
-          <input type="number" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setPrecio} value={compra.precio} />
-          <span className='formText'> Ingresa el precio de la compra </span>
-        </label>
-        <label className='formLabel'>
-          <input type="number" className='formInput' placeholder=' ' required='on' autoComplete='off' onChange={setCantidad} value={compra.cantidad} />
-          <span className='formText'> Ingresa la cantida de la compra en unidades</span>
-        </label>
-        <label className='formLabel'>
-          <input type="date" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setFecha} value={compra.fecha} />
-          <span className='formText'> Selecciona la fecha </span>
-        </label>
-        <div className='contentBtonForms'>
-          <button className='btonAdd'> Crear </button>
-          <button onClick={() => cambiarVista("Compras")} type='button' className='btonBack'> Volver </button>
-        </div>
-      </form>
-    </div>
-  )
-}
-
-function FormModificarCompra({ cambiarVista, compra }) {
-
-
-  const [compraData, setCompraData] = useState({
-    proveedor: compra.proveedor || "",
-    producto: compra.producto || "",
-    precio: compra.precio || 0,
-    cantidad: compra.cantidad || 0,
-    fecha: ""
-  })
-
-  const [proveedores, setProveedores] = useState([])
-
-  useEffect(() => {
-    async function getData() {
-      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=proveedores", {
-        method: "GET",
-      })
-      const response = await dataBase.json()
-      setProveedores(response.data)
-    }
-    getData()
-  }, [])
-
-  const setProveedor = (event) => setCompraData({ ...compraData, proveedor: event.target.value })
-  const setProducto = (event) => setCompraData({ ...compraData, producto: event.target.value })
-  const setPrecio = (event) => setCompraData({ ...compraData, precio: event.target.value })
-  const setCantidad = (event) => setCantidad({ ...compraData, cantidad: event.target.value })
-  const setFecha = (event) => setCompraData({ ...compraData, fecha: event.target.value })
-
-  const handleSubmit = async (event) => {
-    try {
-      event.preventDefault()
-      await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=compras&idCode=${compra.proveedor}&action=update`, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "content-Type": "application/json" },
-        body: JSON.stringify(compraData)
-      })
-      toast.success("Compra modificada correctamente")
-      cambiarVista("Compras")
-    } catch (error) {
-      toast.error("Error al modificar la compra")
-    }
-  }
-
-  return (
-    <div className='contenedorForm'>
-      <h1 className='formTittle'>Modificar compra</h1>
-      <form className='form' onSubmit={handleSubmit}>
-        <label className='formLabel'>
-          <select className='formInput' value={compraData.proveedor} onChange={setProveedor} required="on">
-            <option> - </option>
-            {proveedores.map((proveedor) => (
-              <option key={proveedor.id}>{proveedor.name}</option>
-            ))}
-          </select>
-          <span className='formText'> Seleccione un proveedor </span>
-        </label>
-        <label className='formLabel'>
-          <input type="text" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setProducto} value={compraData.producto} />
-          <span className='formText'> Producto </span>
-        </label>
-        <label className='formLabel'>
-          <input type="number" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setPrecio} value={compraData.precio} />
-          <span className='formText'> Precio </span>
-        </label>
-        <label className='formLabel'>
-          <input type="number" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setCantidad} value={compraData.cantidad} />
-          <span className='formText'> Cantidad en unidades </span>
-        </label>
-        <label className='formLabel'>
-          <input type="date" className='formInput' placeholder=' ' required="on" autoComplete='off' onChange={setFecha}/>
-          <span className='formText'> Fecha </span>
-        </label>
-        <div className='contentBtonForms'>
-          <button className='btonAdd'> Guardar cambios </button>
-          <button onClick={() => cambiarVista("Compras")} type='button' className='btonBack'> Volver </button>
-        </div>
-      </form>
     </div>
   )
 }
@@ -892,7 +507,6 @@ function FormularioAgregarCategoria({ cambiarVista }) {
       })
       setCategoria({ ...categoria, name: "", id: "" })
       toast.success("Categoria agregada con exito")
-      cambiarVista("Venta")
     } catch (error) {
       toast.error("Error al agregar categoria")
     }
@@ -971,7 +585,6 @@ function FormularioAgregarProducto({ cambiarVista }) {
       })
       toast.success("Producto agregado correctamente")
       setProduct({ id: "", name: "", category: "", price: 0, stock: 0 })
-      cambiarVista("Venta")
     } catch (error) {
       toast.error("Error al agregar el producto")
     }
@@ -1030,7 +643,6 @@ function FormularioEliminarCategoria({ cambiarVista }) {
       })
       toast.success("Categoria eliminada correctamente")
       setCategoriaSeleccionada("")
-      cambiarVista("Venta")
     } catch (error) {
       toast.error("Error al eliminar categoria")
     }
@@ -1118,27 +730,15 @@ function App() {
         body: JSON.stringify({})
       })
       refrescarComp()
-      toast.success("Entidad eliminada correctamente")
+      toast.success("Producto eliminado correctamente")
     } catch (error) {
-      toast.error("Error al eliminar la entidad")
+      toast.error("Error al eliminar producto")
     }
   }
   return (
     <>
       <Toaster position="top-center" />
       <div className="app-container">
-        {vista === "modificarCompra" &&
-          <FormModificarCompra cambiarVista={cambiarVista} compra={entidadSeleccionada} />
-        }
-        {vista === "agregarCompra" &&
-          <FormAgregarCompra cambiarVista={cambiarVista} />
-        }
-        {vista === "modificarProveedor" &&
-          <FormModificarProveedor cambiarVista={cambiarVista} proveedor={entidadSeleccionada} />
-        }
-        {vista === "agregarProveedor" &&
-          <FormAgregarProveedor cambiarVista={cambiarVista} />
-        }
         {vista === "modifcarCliente" &&
           <FormModificarCliente cambiarVista={cambiarVista} cliente={entidadSeleccionada} />
         }
@@ -1184,7 +784,7 @@ function App() {
             <Header cambiarVista={cambiarVista} valorVista={vista} />
             <div className="main-content">
               <div className="Historial de ventas">
-                <ProveedoresGrid cambiarVista={cambiarVista} eliminarProveedor={eliminarEntidad} refrescar={refrescar} seleccionarProveedor={seleccionarEntidad} />
+                <ProveedoresGrid />
               </div>
             </div>
           </div >
@@ -1195,7 +795,7 @@ function App() {
             <Header cambiarVista={cambiarVista} valorVista={vista} />
             <div className="main-content">
               <div className="Historial de ventas">
-                <ComprasGrid cambiarVista={cambiarVista} seleccionarCompra={seleccionarEntidad} />
+                <ComprasGrid />
               </div>
             </div>
           </div >
