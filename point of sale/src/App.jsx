@@ -142,7 +142,7 @@ function FormModificarCliente({ cambiarVista, cliente }) {
   const handleSubmit = async (event) => {
     try {
       event.preventDefault()
-      await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=clientes&idCode=${cliente.id}&action=update`, {
+      await fetch(`https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=clientes&idCode=${clienteData.id}&action=update`, {
         method: "POST",
         mode: "no-cors",
         headers: { "content-Type": "application/json" },
