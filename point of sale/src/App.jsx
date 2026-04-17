@@ -42,10 +42,29 @@ function Header({ cambiarVista, valorVista }) {
 }
 
 function HistorialVentasGrid() {
-  return (
+  const [ventas, setVentas] = useState([]);
+  const [cargando, setCargando] = useState(true);
 
+  useEffect(() => {
+    async function getVentas() {
+      try {
+        const dataBase = await fetch(
+          "https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=ventas",
+          { method: "GET" }
+        );
+        const response = await dataBase.json();
+        setVentas(response.data.reverse()); 
+      } catch (error) {
+        console.error("Error al cargar el historial", error);
+      } finally {
+        setCargando(false);
+      }
+    }
+    getVentas();
+  }, []);
+
+  return (
     <div className="recuadro">
-      {/* Barra superior con título y filtro */}
       <div className="actions-bar">
         <h2>Historial de Ventas</h2>
         <div className="actions-container">
@@ -54,10 +73,36 @@ function HistorialVentasGrid() {
           </select>
         </div>
       </div>
-      <div className="recuadro-grid">
+      
+      <div className="recuadro-grid" style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '10px' }}>
+        {cargando && (
+          <div className="loader">
+            <div className="spinner"></div>
+          </div>
+        )}
+        {!cargando && ventas.length === 0 && (
+          <p style={{ textAlign: 'center' }}>No hay ventas registradas</p>
+        )}
+        {!cargando && ventas.map((venta) => (
+          <div key={venta.id} style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'white', padding: '15px', borderRadius: '8px', border: '1px solid #ccc' }}>
+            <div>
+              <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>{venta.id}</p>
+              <p style={{ margin: '0', fontSize: '14px', color: '#555' }}>{venta.fecha}</p>
+            </div>
+            <div>
+              <p style={{ margin: '0 0 5px 0' }}>Cliente: {venta.clienteId}</p>
+              <p style={{ margin: '0', fontSize: '14px' }}>Pago: {venta.metodoPago}</p>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ margin: '0 0 5px 0', fontWeight: 'bold', fontSize: '18px', color: 'rgb(41, 145, 41)' }}>
+                ${venta.total}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
-  )
+  );
 }
 
 function ClientesGrid({ cambiarVista, eliminarCliente, refrescar, seleccionaClienter }) {
@@ -663,7 +708,8 @@ function ActionsBarVenta({ cambiarVista, setCategoriaFiltro, categoriaFiltro, bu
 
   useEffect(() => {
     async function getData() {
-      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=categorias", {
+      // URL CORREGIDA
+      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=categorias", {
         method: "GET"
       })
       const response = await dataBase.json()
@@ -702,6 +748,72 @@ function ActionsBarVenta({ cambiarVista, setCategoriaFiltro, categoriaFiltro, bu
     </div>
   );
 }
+
+// PRODUCT GRID CON URL CORREGIDA Y BOTON CONECTADO
+function ProductGrid({ eliminarProducto, cambiarVista, seleccionarProducto, categoriaFiltro, busqueda, refrescar, agregarAlCarrito }) {
+  const [productos, setProductos] = useState([])
+  const [cargando, setCargado] = useState(true)
+
+  useEffect(() => {
+    async function getData() {
+      // URL CORREGIDA
+      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=productos", {
+        method: "GET"
+      })
+      const response = await dataBase.json()
+      setProductos(response.data)
+      setCargado(false)
+    }
+    getData()
+  }, [refrescar])
+
+  const productosFiltrados = productos
+    .filter(p => categoriaFiltro === "Todos" || p.category === categoriaFiltro)
+    .filter(p => p.name.toLowerCase().includes(busqueda.toLowerCase()))
+
+  return (
+    <div className="product-grid">
+      {cargando &&
+        <div className='loader'>
+          <div className='spinner'></div>
+        </div>
+      }
+      {!cargando && productosFiltrados.length === 0 &&
+        <div className='isEmpetyCat'>
+          <p>No hay productos en esta categoría</p>
+        </div>
+      }
+      {!cargando &&
+        productosFiltrados.map((producto) => {
+          return (
+            <div className='boxProduct' key={producto.id}>
+              <p className='textBox'> Producto: {producto.name}</p>
+              <p className='textBox'> Categoría: {producto.category}</p>
+              <p className='textBox'> Stock: {producto.stock}</p>
+              <div className='btnesDisposi'>
+                <span className='contentPrice'> ${producto.price} COP</span>
+                {/* BOTÓN + CONECTADO */}
+                <button className='btonPlus' onClick={() => agregarAlCarrito(producto)}> + </button>
+              </div>
+              <div className='btonesMoldearProdcuto'>
+                <button className='btonModifPorducto' onClick={() => {
+                  seleccionarProducto(producto)
+                  cambiarVista("modificarProducto")
+                }}>
+                  Modificar
+                </button>
+                <button className='btonDelProducto' onClick={() => eliminarProducto(producto.id, "productos")}>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          )
+        })
+      }
+    </div>
+  )
+}
+
 function FormModificarProducto({ cambiarVista, producto }) {
   const [product, setProduct] = useState({
     id: producto.id || "",
@@ -784,85 +896,130 @@ function FormModificarProducto({ cambiarVista, producto }) {
   )
 }
 
-function ProductGrid({ eliminarProducto, cambiarVista, seleccionarProducto, categoriaFiltro, busqueda, refrescar }) {
-  const [productos, setProductos] = useState([])
-  const [cargando, setCargado] = useState(true)
+function Cart({ carrito, setCarrito }) {
+  const [clientes, setClientes] = useState([]);
+  const [clienteSeleccionado, setClienteSeleccionado] = useState("");
+  const [metodoPago, setMetodoPago] = useState("Efectivo");
+  const [procesando, setProcesando] = useState(false);
+
+  const total = carrito.reduce((suma, item) => suma + item.price * item.cantidad, 0);
 
   useEffect(() => {
-    async function getData() {
-      const dataBase = await fetch("https://script.google.com/macros/s/AKfycbxYfKGwGDYigSP__Tj-2A98hvwvQRrBXJOPHkPykLhPtCMpeYxu6dUxdrevT4ep1q4wnw/exec?resource=productos", {
-        method: "GET"
-      })
-      const response = await dataBase.json()
-      setProductos(response.data)
-      setCargado(false)
+    async function getClientes() {
+      try {
+        const dataBase = await fetch(
+          "https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=clientes",
+          { method: "GET" },
+        );
+        const response = await dataBase.json();
+        setClientes(response.data);
+      } catch (error) {
+        console.error("Error al cargar clientes", error);
+      }
     }
-    getData()
-  }, [refrescar])
+    getClientes();
+  }, []);
 
-  const productosFiltrados = productos
-    .filter(p => categoriaFiltro === "Todos" || p.category === categoriaFiltro)
-    .filter(p => p.name.toLowerCase().includes(busqueda.toLowerCase()))
+  function sumarCantidad(id) {
+    setCarrito(carrito.map((item) => item.id === id ? { ...item, cantidad: item.cantidad + 1 } : item));
+  }
 
-  return (
-    <div className="product-grid">
-      {cargando &&
-        <div className='loader'>
-          <div className='spinner'></div>
-        </div>
-      }
-      {!cargando && productosFiltrados.length === 0 &&
-        <div className='isEmpetyCat'>
-          <p>No hay productos en esta categoría</p>
-        </div>
-      }
-      {!cargando &&
-        productosFiltrados.map((producto) => {
-          return (
-            <div className='boxProduct' key={producto.id}>
-              <p className='textBox'> Producto: {producto.name}</p>
-              <p className='textBox'> Categoría: {producto.category}</p>
-              <p className='textBox'> Stock: {producto.stock}</p>
-              <div className='btnesDisposi'>
-                <span className='contentPrice'> ${producto.price} COP</span>
-                <button className='btonPlus'> + </button>
-              </div>
-              <div className='btonesMoldearProdcuto'>
-                <button className='btonModifPorducto' onClick={() => {
-                  seleccionarProducto(producto)
-                  cambiarVista("modificarProducto")
-                }}>
-                  Modificar
-                </button>
-                <button className='btonDelProducto' onClick={() => eliminarProducto(producto.id, "productos")}>
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          )
-        })
-      }
-    </div>
-  )
-}
+  function restarCantidad(id) {
+    setCarrito(carrito.map((item) => item.id === id ? { ...item, cantidad: item.cantidad - 1 } : item).filter((item) => item.cantidad > 0));
+  }
 
-function Cart() {
+  function vaciarCarrito() { setCarrito([]); }
+  function eliminarDelCarrito(id) { setCarrito(carrito.filter((item) => item.id !== id)); }
+
+  async function realizarPago() {
+    if (carrito.length === 0) {
+      toast.error("El carrito está vacío");
+      return;
+    }
+    setProcesando(true);
+    const idVenta = "V-" + Date.now();
+    const datosVenta = {
+      id: idVenta,
+      fecha: new Date().toLocaleString(),
+      clienteId: clienteSeleccionado || "Cliente General",
+      metodoPago: metodoPago,
+      total: total,
+      itemsJson: carrito, 
+    };
+
+    try {
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbx6WJEr9lo_5Y1sFYSGeoMk3Z3Or37epMWBZNpJ-dSg8z2Z4m0Spwp0RphsvxotNNlVPw/exec?resource=ventas",
+        {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datosVenta),
+        },
+      );
+      toast.success(`¡Venta ${idVenta} registrada con éxito!`);
+      setCarrito([]);
+      setClienteSeleccionado("");
+      setMetodoPago("Efectivo");
+    } catch (error) {
+      toast.error("Hubo un error al registrar la venta");
+    } finally {
+      setProcesando(false);
+    }
+  }
+
   return (
     <div className="cart">
-
-
-      <h2>Carro de compras</h2>
-
-      {/* Área donde va la info del pedido, pero eso se hace con backend */}
-      <div className="cart-empty">
-        {/* Aquí luego aparecerán los productos */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Carro de compras</h2>
+        {carrito.length > 0 && (
+          <button onClick={vaciarCarrito} style={{ backgroundColor: '#db3434', color: 'white', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer', fontWeight: 'bold' }}>Vaciar todo</button>
+        )}
       </div>
 
-      {/* Botón de pago */}
-      <button className="pay-btn">
-        REALIZAR PAGO
-      </button>
+      <div className="cart-empty" style={{ overflowY: "auto", padding: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
+        {carrito.length === 0 ? (
+          <p style={{ textAlign: "center", color: "gray" }}>Tu carrito está vacío</p>
+        ) : (
+          carrito.map((item) => (
+            <div key={item.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #ccc", paddingBottom: "10px" }}>
+              <div>
+                <p style={{ margin: "0", fontWeight: "bold" }}>{item.name}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '5px' }}>
+                  <button onClick={() => restarCantidad(item.id)} style={{ padding: '2px 8px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc' }}>-</button>
+                  <span style={{ fontSize: '14px', fontWeight: 'bold' }}>{item.cantidad}</span>
+                  <button onClick={() => sumarCantidad(item.id)} style={{ padding: '2px 8px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc' }}>+</button>
+                  <span style={{ fontSize: '14px', color: '#555' }}> x ${item.price}</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <p style={{ margin: "0", fontWeight: "bold" }}>${item.price * item.cantidad}</p>
+                <button onClick={() => eliminarDelCarrito(item.id)} style={{ backgroundColor: "#db3434", color: "white", border: "none", borderRadius: "5px", padding: "5px 10px", fontWeight: "bold", cursor: "pointer" }}>X</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
 
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", margin: "15px 0", padding: "10px", backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
+        <label style={{ fontWeight: "bold", fontSize: "14px" }}>Cliente:</label>
+        <select value={clienteSeleccionado} onChange={(e) => setClienteSeleccionado(e.target.value)} className="category-select">
+          <option value="">Cliente General</option>
+          {clientes.map((c) => (<option key={c.id} value={c.name}>{c.name}</option>))}
+        </select>
+        <label style={{ fontWeight: "bold", fontSize: "14px" }}>Método de Pago:</label>
+        <select value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} className="category-select">
+          <option value="Efectivo">Efectivo</option>
+          <option value="Nequi">Nequi</option>
+          <option value="Debe">Debe</option>
+        </select>
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "20px", fontWeight: "bold", marginBottom: "15px" }}>
+        <span>Total:</span><span>${total} COP</span>
+      </div>
+      <button className="pay-btn" onClick={realizarPago} disabled={carrito.length === 0 || procesando} style={{ opacity: carrito.length === 0 || procesando ? 0.5 : 1 }}>
+        {procesando ? "PROCESANDO..." : "REALIZAR PAGO"}
+      </button>
     </div>
   );
 }
@@ -1080,35 +1237,35 @@ function FormularioEliminarCategoria({ cambiarVista }) {
 
 function App() {
   const [vista, setVista] = useState("Venta")
-
   const [entidadSeleccionada, setEntidadSeleccionada] = useState(null)
-
   const [categoriaFiltro, setCategoriaFiltro] = useState("Todos")
-
   const [busqueda, setBusqueda] = useState("")
-
   const [refrescar, setRefrescar] = useState(false)
 
-  function refrescarComp() {
-    setRefrescar(!refrescar)
+  // ESTADO DEL CARRITO AÑADIDO
+  const [carrito, setCarrito] = useState([])
+
+  // FUNCIÓN PARA AGREGAR AÑADIDA
+  function agregarAlCarrito(producto) {
+    const productoExistente = carrito.find((item) => item.id === producto.id)
+    if (productoExistente) {
+      setCarrito(carrito.map((item) => item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item))
+      toast.success(`Se agregó otra unidad de ${producto.name}`)
+    } else {
+      setCarrito([...carrito, { ...producto, cantidad: 1 }])
+      toast.success(`${producto.name} agregado al carrito`)
+    }
   }
 
-  function cambiarBusquedaSeleccionada(nombre) {
-    setBusqueda(nombre)
-  }
-
-  function cambiarCategoriaSeleccionada(categoria) {
-    setCategoriaFiltro(categoria)
-  }
-  function seleccionarEntidad(entidad) {
-    setEntidadSeleccionada(entidad)
-  }
+  function refrescarComp() { setRefrescar(!refrescar) }
+  function cambiarBusquedaSeleccionada(nombre) { setBusqueda(nombre) }
+  function cambiarCategoriaSeleccionada(categoria) { setCategoriaFiltro(categoria) }
+  function seleccionarEntidad(entidad) { setEntidadSeleccionada(entidad) }
 
   function cambiarVista(nuevaVista) {
     setVista(nuevaVista)
     console.log(`Venimos de: ${vista} y pasamos a ${nuevaVista}`)
   }
-
 
   async function eliminarEntidad(idCode, resource) {
     try {
@@ -1123,42 +1280,26 @@ function App() {
       toast.error("Error al eliminar la entidad")
     }
   }
+
   return (
     <>
       <Toaster position="top-center" />
       <div className="app-container">
-        {vista === "modificarCompra" &&
-          <FormModificarCompra cambiarVista={cambiarVista} compra={entidadSeleccionada} />
-        }
-        {vista === "agregarCompra" &&
-          <FormAgregarCompra cambiarVista={cambiarVista} />
-        }
-        {vista === "modificarProveedor" &&
-          <FormModificarProveedor cambiarVista={cambiarVista} proveedor={entidadSeleccionada} />
-        }
-        {vista === "agregarProveedor" &&
-          <FormAgregarProveedor cambiarVista={cambiarVista} />
-        }
-        {vista === "modifcarCliente" &&
-          <FormModificarCliente cambiarVista={cambiarVista} cliente={entidadSeleccionada} />
-        }
-        {vista === "agregarClientes" &&
-          <FormAgregarCliente cambiarVista={cambiarVista} />
-        }
-        {vista === "agregarProducto" &&
-          <FormularioAgregarProducto cambiarVista={cambiarVista} />
-        }
-        {vista === "agregarCategoria" &&
-          <FormularioAgregarCategoria cambiarVista={cambiarVista} />
-        }
-        {vista === "eliminarCategoria" &&
-          <FormularioEliminarCategoria cambiarVista={cambiarVista} />
-        }
-        {vista === "modificarProducto" &&
-          <FormModificarProducto cambiarVista={cambiarVista} producto={entidadSeleccionada} />
-        }
+        {/* Formularios varios se mantienen intactos */}
+        {vista === "modificarCompra" && <FormModificarCompra cambiarVista={cambiarVista} compra={entidadSeleccionada} />}
+        {vista === "agregarCompra" && <FormAgregarCompra cambiarVista={cambiarVista} />}
+        {vista === "modificarProveedor" && <FormModificarProveedor cambiarVista={cambiarVista} proveedor={entidadSeleccionada} />}
+        {vista === "agregarProveedor" && <FormAgregarProveedor cambiarVista={cambiarVista} />}
+        {vista === "modifcarCliente" && <FormModificarCliente cambiarVista={cambiarVista} cliente={entidadSeleccionada} />}
+        {vista === "agregarClientes" && <FormAgregarCliente cambiarVista={cambiarVista} />}
+        {vista === "agregarProducto" && <FormularioAgregarProducto cambiarVista={cambiarVista} />}
+        {vista === "agregarCategoria" && <FormularioAgregarCategoria cambiarVista={cambiarVista} />}
+        {vista === "eliminarCategoria" && <FormularioEliminarCategoria cambiarVista={cambiarVista} />}
+        {vista === "modificarProducto" && <FormModificarProducto cambiarVista={cambiarVista} producto={entidadSeleccionada} />}
+        
+        {/* Vistas Principales */}
         {vista === "Clientes" &&
-          < div >
+          <div>
             <Header cambiarVista={cambiarVista} valorVista={vista} />
             <div className="main-content">
               <div className="Historial de ventas">
@@ -1167,8 +1308,7 @@ function App() {
             </div>
           </div>
         }
-        {
-          vista === "Historial de ventas" &&
+        {vista === "Historial de ventas" &&
           <div>
             <Header cambiarVista={cambiarVista} valorVista={vista} />
             <div className="main-content">
@@ -1178,44 +1318,42 @@ function App() {
             </div>
           </div>
         }
-        {
-          vista === "Proveedores" &&
-          < div >
+        {vista === "Proveedores" &&
+          <div>
             <Header cambiarVista={cambiarVista} valorVista={vista} />
             <div className="main-content">
               <div className="Historial de ventas">
                 <ProveedoresGrid cambiarVista={cambiarVista} eliminarProveedor={eliminarEntidad} refrescar={refrescar} seleccionarProveedor={seleccionarEntidad} />
               </div>
             </div>
-          </div >
+          </div>
         }
-        {
-          vista === "Compras" &&
-          < div >
+        {vista === "Compras" &&
+          <div>
             <Header cambiarVista={cambiarVista} valorVista={vista} />
             <div className="main-content">
               <div className="Historial de ventas">
                 <ComprasGrid cambiarVista={cambiarVista} seleccionarCompra={seleccionarEntidad} />
               </div>
             </div>
-          </div >
+          </div>
         }
-        {
-          vista === "Venta" &&
+        {vista === "Venta" &&
           <div>
             <Header cambiarVista={cambiarVista} valorVista={vista} />
             <div className="main-content">
               <div className="catalogo">
-                <ActionsBarVenta cambiarVista={cambiarVista} setCategoriaFiltro={cambiarCategoriaSeleccionada} busqueda={cambiarBusquedaSeleccionada} setBusqueda={cambiarBusquedaSeleccionada} />
-                <ProductGrid eliminarProducto={eliminarEntidad} cambiarVista={cambiarVista} seleccionarProducto={seleccionarEntidad} categoriaFiltro={categoriaFiltro} busqueda={busqueda} refrescar={refrescar} />
+                {/* Se corrigió el error de la propiedad busqueda y se pasó agregarAlCarrito */}
+                <ActionsBarVenta cambiarVista={cambiarVista} setCategoriaFiltro={cambiarCategoriaSeleccionada} categoriaFiltro={categoriaFiltro} busqueda={busqueda} setBusqueda={cambiarBusquedaSeleccionada} />
+                <ProductGrid eliminarProducto={eliminarEntidad} cambiarVista={cambiarVista} seleccionarProducto={seleccionarEntidad} categoriaFiltro={categoriaFiltro} busqueda={busqueda} refrescar={refrescar} agregarAlCarrito={agregarAlCarrito} />
               </div>
               <div>
-                <Cart />
+                <Cart carrito={carrito} setCarrito={setCarrito} />
               </div>
             </div>
           </div>
         }
-      </div >
+      </div>
     </>
   );
 }
